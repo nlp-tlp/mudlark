@@ -1,4 +1,6 @@
+import configparser
 import pandas as pd
+from typing import List
 
 
 def singularise(word: str):
@@ -172,6 +174,34 @@ def remove_commas(text):
     return text.replace(",", " ")
 
 
-def load_corrections(path: str):
-    corrections = pd.read_csv(path)
-    return corrections
+def load_csv_file(path: str):
+    """Use Pandas to load the CSV file at the given path.
+
+    Args:
+        path (str): The file to load.
+
+    Returns:
+        pd.DataFrame: The pandas dataframe.
+    """
+    df = pd.read_csv(path)
+    return df
+
+
+def extract_keep_columns(kc: str) -> List[str]:
+    """Extract the 'keep columns' from the user-specified string.
+    It should be a list of columns the user wants to keep,
+    separated by comma.
+
+    Args:
+        kc (str): The string to parse.
+
+    Returns:
+        list[str]: The list of columns.
+    """
+    return [s.strip() for s in kc.split(",")]
+
+
+def load_config(path: str):
+    config = configparser.ConfigParser()
+    config.read(path)
+    return {k: v for (k, v) in config.items("DEFAULT")}

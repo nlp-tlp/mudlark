@@ -1,11 +1,22 @@
 import os
+import sys
 import typer
 import pathlib
+from typing import List
 from typing_extensions import Annotated, Optional
+from loguru import logger
 
 from .utils import *
 
 app = typer.Typer()
+logger.remove()
+logger.add(
+    sys.stderr,
+    colorize=True,
+    format="<level>{level}</level>\t{message}",
+    filter="mudlark",
+    level="DEBUG",
+)
 
 
 @app.command()
@@ -20,10 +31,13 @@ def normalise_csv(
             "'short text', 'risk name', etc."
         ),
     ],
-    corrections_path: Annotated[
+    config_path: Annotated[
         Optional[str],
-        typer.Argument(
-            help="The path containing the CSV." " to use for corrections."
+        typer.Option(
+            help="The path containing the config file. If not present, "
+            "Mudlark will attempt to load 'mudlark.ini' if it exists. "
+            "Failing that, the default config will be used. See the README "
+            "for details on how to structure the config file."
         ),
     ] = None,
 ):
@@ -34,18 +48,35 @@ def normalise_csv(
         text_column (str): The name of the text column, for example
            'short text', 'risk name', etc.
     """
-    print(f"Normalising csv: '{path}'")
+    logger.info(f"Normalising csv: '{path}'")
 
-    if corrections_path is None:
+    # Load the config.
+    if config_path is None:
+        if os.path.isfile("mudlark.ini"):
+            config_path = "mudlark.ini"
+        else:
+            config_path = os.path.join(
+                pathlib.Path(__file__).parent.resolve().parent.resolve(),
+                "default.ini",
+            )
+    config = load_config(config_path)
+    logger.debug(config)
+
+    # If the user has specified any 'keep columns' in the config,
+    # load them into a list of strings.
+    if config["keep_columns"] is not None:
+        keep_columns = extract_keep_columns(config["keep_columns"])
+
+    # Load the corrections dictionary.
+    # If it is blank in the config, load the default one.
+    corrections_path = config["corrections_path"]
+    if config["corrections_path"] == "":
         corrections_path = os.path.join(
             pathlib.Path(__file__).parent.resolve(),
             "dictionaries",
             "mwo_corrections.csv",
         )
-
-    print("Corrections path:", corrections_path)
-
-    corrections = load_corrections(corrections_path)
+    corrections = load_csv_file(corrections_path)
 
 
 @app.command()
