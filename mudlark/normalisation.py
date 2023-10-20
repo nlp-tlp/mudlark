@@ -6,30 +6,52 @@ from .logger import logger
 
 
 def normalise_dataframe(
-    df: pd.DataFrame, corrections_dict: dict, drop_duplicates: str = None
-):
+    df: pd.DataFrame,
+    text_column: str,
+    corrections_dict: dict,
+    max_words: int = None,
+    drop_duplicates: bool = False,
+) -> pd.DataFrame:
     """Summary
 
     Args:
         df (pd.DataFrame): The dataframe to normalise.
+        text_column (str): The column containing the text to normalise.
         corrections_dict (dict): The dictionary of corrections.
-        drop_duplicates (str, optional): If present, any rows where the
+        max_words (int, optional): If present, drop all rows where
+           the text field contains > max_words words.
+        drop_duplicates (bool, optional): If present, any rows where the
            specified column is a duplicate will be dropped.
     """
 
-    if drop_duplicates is not None:
+    # If drop_duplicates is True, drop rows accordingly
+    if drop_duplicates:
         rows_before = len(df)
-        df = df.drop_duplicates(subset=drop_duplicates, keep="first")
+        df = df.drop_duplicates(subset=text_column, keep="first")
         rows_after = len(df)
         logger.info(
             f"Dropped {rows_before - rows_after} duplicate rows "
             f"({rows_before} -> {rows_after})."
         )
 
-    print(df["Risk Name"])
+    # If max_words is present, drop all rows with > max_words
+    if max_words:
+        rows_before = len(df)
+        df = df[df[text_column].apply(lambda x: len(x.split()) < max_words)]
+        rows_after = len(df)
+        logger.info(
+            f"Dropped {rows_before - rows_after} rows with > {max_words} "
+            f"words ({rows_before} -> {rows_after})."
+        )
+
+    # Run the normalisation over each row, on the text column
+    df[text_column] = df[text_column].apply(
+        lambda x: normalise_text(x, corrections_dict)
+    )
+    return df
 
 
-def normalise_text(text: str, corrections_dict: dict):
+def normalise_text(text: str, corrections_dict: dict) -> str:
     """Normalise the given text using a pipeline-based approach.
 
     Args:

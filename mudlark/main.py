@@ -1,14 +1,13 @@
 import os
 import sys
 import typer
-import pathlib
 from typing import List
 from typing_extensions import Annotated, Optional
 from typer_config import use_yaml_config
 
 from .logger import logger
 from .utils import *
-from .normalisation import normalise_text, normalise_dataframe
+from .normalisation import normalise_text as normalise, normalise_dataframe
 from .config import *
 
 app = typer.Typer()
@@ -44,10 +43,10 @@ def normalise_csv(
     drop_duplicates: Annotated[
         Optional[str],
         typer.Option(
-            help="If specified, any rows containing a duplicate value for "
-            "the specified column will be dropped."
+            help="If true, any rows with the same text in the text field "
+            "as another row will be dropped."
         ),
-    ] = None,
+    ] = False,
     keep_columns: Annotated[
         Optional[str],
         typer.Option(
@@ -75,29 +74,43 @@ def normalise_csv(
 
     # Load the corrections dictionary.
     # If it is not specified, load the default one.
-    if corrections_path == "" or corrections_path is None:
-        corrections_path = os.path.join(
-            pathlib.Path(__file__).parent.resolve(),
-            "dictionaries",
-            "mwo_corrections.csv",
-        )
     corrections_dict = load_corrections_dict(corrections_path)
 
-    n = normalise_text("rePLACE pmp", corrections_dict)
+    # Load the CSV into a DataFrame
+    input_df = load_csv_file(input_path)
 
-    input_data = load_csv_file(input_path)
-
-    normalise_dataframe(input_data, corrections_dict, drop_duplicates)
+    # Normalise the DataFrame
+    output_df = normalise_dataframe(
+        input_df, text_column, corrections_dict, max_words, drop_duplicates
+    )
 
 
 @app.command()
-def normalise_sent(sent: str):
+def normalise_text(
+    text: Annotated[
+        str,
+        typer.Argument(help="The text to normalise."),
+    ],
+    corrections_path: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The path containing the CSV to use for corrections. "
+            "If not specified, the default corrections csv will be used."
+        ),
+    ] = None,
+):
     """Normalise a single sentence, such as ``replace brokn pump''.
 
     Args:
-        sent (str): The sentence to normalise.
+        text (str): The text to normalise.
+        corrections_path (str): The path containing the CSV to use for
+           corrections. If not specified, the default corrections csv
+           will be used.
     """
-    print(f"Normalising string {sent}")
+    corrections_dict = load_corrections_dict(corrections_path)
+    normalised_text = normalise(text, corrections_dict)
+    logger.debug(f"{text} -> {normalised_text}")
+    return normalise_text
 
 
 if __name__ == "__main__":
