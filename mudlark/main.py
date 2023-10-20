@@ -8,6 +8,7 @@ from typer_config import use_yaml_config
 
 from .logger import logger
 from .utils import *
+from .normalisation import normalise_text, normalise_dataframe
 from .config import *
 
 app = typer.Typer()
@@ -16,12 +17,12 @@ app = typer.Typer()
 @app.command()
 @use_yaml_config()
 def normalise_csv(
-    path: Annotated[
-        str, typer.Argument(help="The path of the CSV to normalise.")
+    input_path: Annotated[
+        str, typer.Option(help="The path of the CSV to normalise.")
     ],
     text_column: Annotated[
         str,
-        typer.Argument(
+        typer.Option(
             help="The name of the text column, for example"
             "'short text', 'risk name', etc."
         ),
@@ -65,7 +66,7 @@ def normalise_csv(
            'short text', 'risk name', etc.
     """
 
-    logger.info(f"Normalising csv: '{path}'")
+    logger.info(f"Normalising csv: '{input_path}'")
 
     # If the user has specified any 'keep columns' in the config,
     # load them into a list of strings.
@@ -80,7 +81,13 @@ def normalise_csv(
             "dictionaries",
             "mwo_corrections.csv",
         )
-    corrections = load_csv_file(corrections_path)
+    corrections_dict = load_corrections_dict(corrections_path)
+
+    n = normalise_text("rePLACE pmp", corrections_dict)
+
+    input_data = load_csv_file(input_path)
+
+    normalise_dataframe(input_data, corrections_dict, drop_duplicates)
 
 
 @app.command()
