@@ -1,4 +1,3 @@
-import configparser
 import pandas as pd
 from typing import List
 
@@ -187,7 +186,7 @@ def load_csv_file(path: str):
     return df
 
 
-def extract_keep_columns(kc: str) -> List[str]:
+def parse_keep_columns(kc: str) -> List[str]:
     """Extract the 'keep columns' from the user-specified string.
     It should be a list of columns the user wants to keep,
     separated by comma.
@@ -199,9 +198,3 @@ def extract_keep_columns(kc: str) -> List[str]:
         list[str]: The list of columns.
     """
     return [s.strip() for s in kc.split(",")]
-
-
-def load_config(path: str):
-    config = configparser.ConfigParser()
-    config.read(path)
-    return {k: v for (k, v) in config.items("DEFAULT")}

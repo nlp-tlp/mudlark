@@ -4,22 +4,17 @@ import typer
 import pathlib
 from typing import List
 from typing_extensions import Annotated, Optional
-from loguru import logger
+from typer_config import use_yaml_config
 
+from .logger import logger
 from .utils import *
+from .config import *
 
 app = typer.Typer()
-logger.remove()
-logger.add(
-    sys.stderr,
-    colorize=True,
-    format="<level>{level}</level>\t{message}",
-    filter="mudlark",
-    level="DEBUG",
-)
 
 
 @app.command()
+@use_yaml_config()
 def normalise_csv(
     path: Annotated[
         str, typer.Argument(help="The path of the CSV to normalise.")
@@ -31,13 +26,34 @@ def normalise_csv(
             "'short text', 'risk name', etc."
         ),
     ],
-    config_path: Annotated[
+    corrections_path: Annotated[
         Optional[str],
         typer.Option(
-            help="The path containing the config file. If not present, "
-            "Mudlark will attempt to load 'mudlark.ini' if it exists. "
-            "Failing that, the default config will be used. See the README "
-            "for details on how to structure the config file."
+            help="The path containing the CSV to use for corrections. "
+            "If not specified, the default corrections csv will be used."
+        ),
+    ] = None,
+    max_words: Annotated[
+        Optional[int],
+        typer.Option(
+            help="If true, documents with more than the specified number "
+            "of words in the text column will be dropped."
+        ),
+    ] = None,
+    drop_duplicates: Annotated[
+        Optional[str],
+        typer.Option(
+            help="If specified, any rows containing a duplicate value for "
+            "the specified column will be dropped."
+        ),
+    ] = None,
+    keep_columns: Annotated[
+        Optional[str],
+        typer.Option(
+            help="If specified, only the given columns will be "
+            "kept in the final output. Columns should be given as a "
+            "comma separated list surrounded by double quotes, e.g. "
+            '"col1, col2, col3"...'
         ),
     ] = None,
 ):
@@ -48,29 +64,17 @@ def normalise_csv(
         text_column (str): The name of the text column, for example
            'short text', 'risk name', etc.
     """
-    logger.info(f"Normalising csv: '{path}'")
 
-    # Load the config.
-    if config_path is None:
-        if os.path.isfile("mudlark.ini"):
-            config_path = "mudlark.ini"
-        else:
-            config_path = os.path.join(
-                pathlib.Path(__file__).parent.resolve().parent.resolve(),
-                "default.ini",
-            )
-    config = load_config(config_path)
-    logger.debug(config)
+    logger.info(f"Normalising csv: '{path}'")
 
     # If the user has specified any 'keep columns' in the config,
     # load them into a list of strings.
-    if config["keep_columns"] is not None:
-        keep_columns = extract_keep_columns(config["keep_columns"])
+    if keep_columns is not None:
+        keep_columns = parse_keep_columns(keep_columns)
 
     # Load the corrections dictionary.
-    # If it is blank in the config, load the default one.
-    corrections_path = config["corrections_path"]
-    if config["corrections_path"] == "":
+    # If it is not specified, load the default one.
+    if corrections_path == "" or corrections_path is None:
         corrections_path = os.path.join(
             pathlib.Path(__file__).parent.resolve(),
             "dictionaries",
