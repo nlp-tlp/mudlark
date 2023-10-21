@@ -4,7 +4,7 @@ mudlark
 
 Mudlark is a Python package for automatically cleaning the technical language present across many CSV-based datasets.
 
-It is designed for those who have a CSV dataset with a text column, for example:
+It is designed for the rapid and easy preprocessing of CSV datasets that have a text column, for example:
 
 .. list-table::
     :widths: 20 20 20
@@ -27,11 +27,15 @@ Using Mudlark, you can take this dataset and normalise (clean) the text column (
 
 Mudlark also has a few other smaller features, such as the ability to drop rows where the text column contains too many words, the ability to drop duplicate rows, and so on.
 
+We also provide a simple function to normalise a single piece of text, detailed below.
+
+Note that at this stage, the pipeline-based normalisation method that we use is designed for maintenance work orders, but it is also applicable to other domains featuring similar technical language.
+
 ============
 Installation
 ============
 
-We plan to put Mudlark on PyPI soon, after which you will be able to run:
+We plan to put Mudlark on PyPI soon, after which you will be able to run::
 
     pip install mudlark
 
@@ -52,7 +56,7 @@ Once Mudlark is installed, you can run it via:
 
 There are currently two functions available:
 
-- ``normalise-csv`` takes an input CSV file and 'normalises' it by running the text column of that CSV through a preprocessing pipeline.
+- ``normalise-csv`` takes an input CSV file and normalises it by running the CSV through a preprocessing pipeline. The text column of the CSV is cleaned using our pipeline-based approach.
 - ``normalise-text`` does the same as the above, but on a single string.
 
 To get a full list of the arguments, you can run::
