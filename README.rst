@@ -50,7 +50,7 @@ Mudlark can be used two ways: via the command line, and directly in Python.
 Running Mudlark via command line
 --------------------------------
 
-Once Mudlark is installed, you can run it via:
+Once Mudlark is installed, you can run it via::
 
     python -m mudlark <function> <arguments>
 
@@ -59,17 +59,13 @@ There are currently two functions available:
 - ``normalise-csv`` takes an input CSV file and normalises it by running the CSV through a preprocessing pipeline. The text column of the CSV is cleaned using our pipeline-based approach.
 - ``normalise-text`` does the same as the above, but on a single string.
 
-To get a full list of the arguments, you can run::
-
-    python -m mudlark normalise-csv --help
-
-Or alternatively::
-
-    python -m mudlark normalise-text --help
-
 ^^^^^^^^^^^^^
 normalise_csv
 ^^^^^^^^^^^^^
+
+To get a full list of the arguments, you can run::
+
+    python -m mudlark normalise-csv --help
 
 A full list of required arguments and optional arguments are shown in the tables below.
 
@@ -118,7 +114,11 @@ Optional arguments:
       - Text
       - If specified, the given column(s) will be used as id columns when generating output for QuickGraph. You may specify one column (for example 'my_id'), or multiple columns separated via comma (for example 'my_id, surname'). This argument is only relevant when output_format = quickgraph.
 
-Here is an example:
+""""""""""""""
+Simple example
+""""""""""""""
+
+Consider the following example:
 
 * We are interested in normalising the dataset called ``test.csv``.
 * We want to save the output to ``test_output.csv``.
@@ -132,7 +132,6 @@ Here is an example:
 The command to do this would be::
 
     python -m mudlark normalise-csv test.csv test_output.csv short_text csv --max-words 15 --drop-duplicates true
-
 
 """""""""""""""""""""""
 Using a config.yml file
@@ -173,13 +172,17 @@ The ``normalise_text`` function is a lot simpler - just two arguments:
 
 Note that this function does not currently support the use of a config yaml file (as it is only two arguments).
 
+As with the ``normalise_csv``, you can get a list of the arguments by using the command::
+
+    python -m mudlark normalise-text --help
+
 -------------------------
 Running Mudlark in Python
 -------------------------
 
 .. highlight:: python
 
-This is a work in progress, but it should be possible to run Mudlark via Python as follows::
+This is yet to be tested, but it should be possible to run Mudlark via Python as follows::
 
     from mudlark import normalise_csv
 

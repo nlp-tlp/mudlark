@@ -182,7 +182,7 @@ def normalise_text(
     corrections_dict = load_corrections_dict(corrections_path)
     normalised_text = normalise(text, corrections_dict)
     logger.debug(f"{text} -> {normalised_text}")
-    return normalise_text
+    return normalised_text
 
 
 if __name__ == "__main__":
