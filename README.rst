@@ -29,8 +29,8 @@ Once Mudlark is installed, you can run it via:
 
 There are currently two functions available:
 
-- `normalise-csv` takes an input CSV file and 'normalises' it by running the text column of that CSV through a preprocessing pipeline.
-- `normalise-text` does the same as the above, but on a single string.
+- ``normalise-csv`` takes an input CSV file and 'normalises' it by running the text column of that CSV through a preprocessing pipeline.
+- ``normalise-text`` does the same as the above, but on a single string.
 
 To get a full list of the arguments, you can run::
 
@@ -39,6 +39,10 @@ To get a full list of the arguments, you can run::
 Or alternatively::
 
     python -m mudlark normalise-text --help
+
+^^^^^^^^^^^^^
+normalise_csv
+^^^^^^^^^^^^^
 
 A full list of required arguments and optional arguments are shown in the tables below.
 
@@ -73,7 +77,7 @@ Optional arguments:
       - Details
     * - ``corrections-path``
       - Text
-      -  The path containing the CSV to use for corrections. If not specified, the default corrections csv will be used.
+      - The path containing the CSV to use for corrections. If not specified, the default corrections csv will be used.
     * - ``max-words``
       - Integer
       -  If specified, documents with more than the specified number of words in the text column will be dropped.
@@ -102,11 +106,12 @@ The command to do this would be::
 
     python -m mudlark normalise-csv test.csv test_output.csv short_text csv --max-words 15 --drop-duplicates true
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Alternative - using a config.yml file
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Writing out long commands like the above can be tedious, so we have also made it possible to read the commands in from a yaml file. Simply create a yaml file (name it something like ``mudlark.yml``), specifying your arguments on each line::
+"""""""""""""""""""""""
+Using a config.yml file
+"""""""""""""""""""""""
+
+Writing out long commands can be tedious, so we have also made it possible to read the commands in from a yaml file. Simply create a yaml file (name it something like ``mudlark.yml``), specifying your arguments on each line::
 
     input_path: test.csv
     output_path: test_output.csv
@@ -119,6 +124,27 @@ Then, you can read it in via the ``config`` argument::
 
     python -m mudlark normalise-csv --config mudlark.yml
 
+^^^^^^^^^^^^^^
+normalise_text
+^^^^^^^^^^^^^^
+
+The ``normalise_text`` function is a lot simpler - just two arguments:
+
+.. list-table::
+    :widths: 35 25 50
+    :header-rows: 1
+
+    * - Argument
+      - Type
+      - Details
+    * - ``text``
+      - Text
+      - The text to normalise. [required]
+    * - ``corrections-path``
+      - Text
+      - The path containing the CSV to use for corrections. If not specified, the default corrections csv will be used.
+
+Note that this function does not currently support the use of a config yaml file (as it is only two arguments).
 
 -------------------------
 Running Mudlark in Python
@@ -126,11 +152,15 @@ Running Mudlark in Python
 
 This is a work in progress, but it should be possible to run Mudlark via Python as follows::
 
-.. code-block:: python
+.. codeblock:: python
 
     from mudlark import normalise_csv
 
+    # Normalising a CSV dataset
     normalise_csv('test.csv', 'test_output.csv', 'short_text', 'csv', max_words=15, drop_duplicates=True)
 
-The arguments are exactly the same as when running it via command line.
+    # Normalising some text
+    normalise_text('pmp is BRokeN')
+
+The arguments are exactly the same as when running the function(s) via command line.
 
