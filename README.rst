@@ -42,11 +42,11 @@ Or alternatively
 
 
 .. list-table:: Required arguments
-    :widths: 35 35 50
+    :widths: 35 25 50
     :header-rows: 1
 
     * - Argument
-      - Data type
+      - Type
       - Details
     * - input-path
       - Text
@@ -64,11 +64,11 @@ Or alternatively
 There are also several optional arguments:
 
 .. list-table:: Optional arguments
-    :widths: 35 35 50
+    :widths: 35 25 50
     :header-rows: 1
 
     * - Argument
-      - Data type
+      - Type
       - Details
     * - corrections-path
       - Text
