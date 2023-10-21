@@ -42,15 +42,13 @@ def load_corrections_dict(path: str = None) -> Dict:
     return corrections_dict
 
 
-def parse_keep_columns(kc: str) -> List[str]:
-    """Extract the 'keep columns' from the user-specified string.
-    It should be a list of columns the user wants to keep,
-    separated by comma.
+def parse_list(s: str):
+    """Parse the given comma-separated string into a list.
 
     Args:
-        kc (str): The string to parse.
+        s (str): The string to parse.
 
     Returns:
-        list[str]: The list of columns.
+        list: The list.
     """
-    return [s.strip() for s in kc.split(",")]
+    return [i.strip() for i in s.split(",")]

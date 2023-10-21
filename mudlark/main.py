@@ -17,11 +17,17 @@ app = typer.Typer()
 @use_yaml_config()
 def normalise_csv(
     input_path: Annotated[
-        str, typer.Option(help="The path of the CSV to normalise.")
+        str, typer.Argument(help="The path of the CSV to normalise.")
+    ],
+    output_path: Annotated[
+        str,
+        typer.Argument(
+            help="The path to save the normalised dataset to once complete."
+        ),
     ],
     text_column: Annotated[
         str,
-        typer.Option(
+        typer.Argument(
             help="The name of the text column, for example"
             "'short text', 'risk name', etc."
         ),
@@ -33,6 +39,14 @@ def normalise_csv(
             "If not specified, the default corrections csv will be used."
         ),
     ] = None,
+    output_format: Annotated[
+        str,
+        typer.Argument(
+            help="The format to save the output. Can be either 'csv' (saves "
+            "the output as a CSV file) or 'quickgraph' (saves the output as "
+            "a QuickGraph-compatible JSON file)."
+        ),
+    ] = "csv",
     max_words: Annotated[
         Optional[int],
         typer.Option(
@@ -56,6 +70,15 @@ def normalise_csv(
             '"col1, col2, col3"...'
         ),
     ] = None,
+    id_columns: Annotated[
+        Optional[str],
+        typer.Option(
+            help="If specified, the given column(s) will be used as "
+            "id columns when generating output for QuickGraph. You may "
+            "specify one column (for example 'my_id'), or multiple columns "
+            "separated via comma (for example 'my_id, surname')."
+        ),
+    ] = None,
 ):
     """Normalise the CSV located at the given path.
 
@@ -67,13 +90,18 @@ def normalise_csv(
 
     logger.info(f"Normalising csv: '{input_path}'")
 
-    # If the user has specified any 'keep columns' in the config,
+    # If the user has specified any 'keep columns',
     # load them into a list of strings.
     if keep_columns is not None:
-        keep_columns = parse_keep_columns(keep_columns)
+        keep_columns = parse_list(keep_columns)
+
+    # If the user has specified any 'id columns',
+    # load them into a list of strings.
+    if id_columns is not None:
+        id_columns = parse_list(id_columns)
 
     # Load the corrections dictionary.
-    # If it is not specified, load the default one.
+    # If it is not specified, the default one will be loaded.
     corrections_dict = load_corrections_dict(corrections_path)
 
     # Load the CSV into a DataFrame
@@ -81,7 +109,15 @@ def normalise_csv(
 
     # Normalise the DataFrame
     output_df = normalise_dataframe(
-        input_df, text_column, corrections_dict, max_words, drop_duplicates
+        input_df,
+        output_path,
+        text_column,
+        corrections_dict,
+        output_format,
+        max_words,
+        drop_duplicates,
+        keep_columns,
+        id_columns,
     )
 
 

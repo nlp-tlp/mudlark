@@ -7,47 +7,58 @@ from .logger import logger
 
 def normalise_dataframe(
     df: pd.DataFrame,
+    output_path: str,
     text_column: str,
     corrections_dict: dict,
+    output_format: str,
     max_words: int = None,
     drop_duplicates: bool = False,
+    keep_columns: list = None,
+    id_columns: list = None,
 ) -> pd.DataFrame:
     """Summary
 
     Args:
         df (pd.DataFrame): The dataframe to normalise.
+        output_path (str): The path to save the output to.
         text_column (str): The column containing the text to normalise.
         corrections_dict (dict): The dictionary of corrections.
+        output_format (str, optional): The output format. Can be either
+           'csv' or 'quickgraph'.
         max_words (int, optional): If present, drop all rows where
            the text field contains > max_words words.
         drop_duplicates (bool, optional): If present, any rows where the
            specified column is a duplicate will be dropped.
+        keep_columns (list, optional): If present, only the given columns
+           will be kept in the output.
+        id_columns (list, optional): If present, the given columns will be
+           used to form a composite id key to include in the output (only
+           when the 'quickgraph' format is used).
     """
+
+    # Input validation
+    if output_format not in ["csv", "quickgraph"]:
+        raise ValueError("Output format must be either 'csv' or 'quickgraph'.")
 
     # If drop_duplicates is True, drop rows accordingly
     if drop_duplicates:
-        rows_before = len(df)
-        df = df.drop_duplicates(subset=text_column, keep="first")
-        rows_after = len(df)
-        logger.info(
-            f"Dropped {rows_before - rows_after} duplicate rows "
-            f"({rows_before} -> {rows_after})."
-        )
+        _run_drop_duplicates(df, text_column)
 
     # If max_words is present, drop all rows with > max_words
     if max_words:
-        rows_before = len(df)
-        df = df[df[text_column].apply(lambda x: len(x.split()) < max_words)]
-        rows_after = len(df)
-        logger.info(
-            f"Dropped {rows_before - rows_after} rows with > {max_words} "
-            f"words ({rows_before} -> {rows_after})."
-        )
+        _run_drop_long_rows(df, text_column, max_words)
 
     # Run the normalisation over each row, on the text column
     df[text_column] = df[text_column].apply(
         lambda x: normalise_text(x, corrections_dict)
     )
+
+    if output_format == "csv":
+        df.to_csv(output_path, index=False)
+        logger.info(f"Saved output to {output_path}.")
+    elif output_format == "quickgraph":
+        print("Can't save as quickgraph yet")
+
     return df
 
 
@@ -106,6 +117,51 @@ def normalise_text(text: str, corrections_dict: dict) -> str:
     # quickgraph_samples.append(
     #     {"original": _text, "tokens": _tokens, "external_id": _id}
     # )
+
+
+def _run_drop_duplicates(df: pd.DataFrame, text_column: str) -> pd.DataFrame:
+    """Remove duplicate rows.
+
+    Args:
+        df (pd.DataFrame): DataFrame to modify.
+        text_column (str): The text column (duplicates of this column
+           will be dropped).
+
+    Returns:
+        pd.DataFrame: The modified DataFrame.
+    """
+    rows_before = len(df)
+    df = df.drop_duplicates(subset=text_column, keep="first")
+    rows_after = len(df)
+    logger.info(
+        f"Dropped {rows_before - rows_after} duplicate rows "
+        f"({rows_before} -> {rows_after})."
+    )
+    return df
+
+
+def _run_drop_long_rows(
+    df: pd.DataFrame, text_column: str, max_words: int
+) -> pd.DataFrame:
+    """Remove rows where the text column has > max_words.
+
+    Args:
+        df (pd.DataFrame): DataFrame to modify.
+        text_column (str): The text column (duplicates of this column
+           will be dropped).
+        max_words (int): The max words allowed in the text column.
+
+    No Longer Returned:
+        pd.DataFrame: The modified DataFrame.
+    """
+    rows_before = len(df)
+    df = df[df[text_column].apply(lambda x: len(x.split()) < max_words)]
+    rows_after = len(df)
+    logger.info(
+        f"Dropped {rows_before - rows_after} rows with > {max_words} "
+        f"words ({rows_before} -> {rows_after})."
+    )
+    return df
 
 
 def _singularise(word: str):
