@@ -1,8 +1,11 @@
 import re
+import json
 from typing import List
 import pandas as pd
 
 from .logger import logger
+
+from .utils import validate_quickgraph_id_columns
 
 
 def normalise_dataframe(
@@ -13,10 +16,10 @@ def normalise_dataframe(
     output_format: str,
     max_words: int = None,
     drop_duplicates: bool = False,
-    keep_columns: list = None,
-    id_columns: list = None,
+    csv_keep_columns: list = None,
+    quickgraph_id_columns: list = None,
 ) -> pd.DataFrame:
-    """Summary
+    """Normalise the given dataframe.
 
     Args:
         df (pd.DataFrame): The dataframe to normalise.
@@ -29,35 +32,34 @@ def normalise_dataframe(
            the text field contains > max_words words.
         drop_duplicates (bool, optional): If present, any rows where the
            specified column is a duplicate will be dropped.
-        keep_columns (list, optional): If present, only the given columns
+        csv_keep_columns (list, optional): If present, only the given columns
            will be kept in the output.
-        id_columns (list, optional): If present, the given columns will be
-           used to form a composite id key to include in the output (only
-           when the 'quickgraph' format is used).
+        quickgraph_id_columns (list, optional): If present, the given columns
+           will be used to form a composite id key to include in the output
+           (only when the 'quickgraph' format is used).
     """
 
     # Input validation
     if output_format not in ["csv", "quickgraph"]:
         raise ValueError("Output format must be either 'csv' or 'quickgraph'.")
 
+    # If keep_columns is present, drop all columns not in this list
+    # (and always keep the text_column).
+    if csv_keep_columns and output_format == "csv":
+        df = _run_drop_unwanted_columns(df, csv_keep_columns, text_column)
+
     # If drop_duplicates is True, drop rows accordingly
     if drop_duplicates:
-        _run_drop_duplicates(df, text_column)
+        df = _run_drop_duplicates(df, text_column)
 
     # If max_words is present, drop all rows with > max_words
     if max_words:
-        _run_drop_long_rows(df, text_column, max_words)
+        df = _run_drop_long_rows(df, text_column, max_words)
 
     # Run the normalisation over each row, on the text column
     df[text_column] = df[text_column].apply(
         lambda x: normalise_text(x, corrections_dict)
     )
-
-    if output_format == "csv":
-        df.to_csv(output_path, index=False)
-        logger.info(f"Saved output to {output_path}.")
-    elif output_format == "quickgraph":
-        print("Can't save as quickgraph yet")
 
     return df
 
@@ -87,7 +89,6 @@ def normalise_text(text: str, corrections_dict: dict) -> str:
 
     # 5. Anonymise sentence
     _text = _anonymise_sentence(_text)
-    # need help to loop through every sentence in the "NOTIFICATION_SHORT_TEXT" field
 
     # 6. Tokenize
     _tokens = _text.split(" ")  # i.e. ["filters", "-", ...]
@@ -110,13 +111,35 @@ def normalise_text(text: str, corrections_dict: dict) -> str:
 
     return _text
 
-    # QuickGraph fields `original`, `tokens`, `external_id`, `extra_fields`
 
-    # _id = f'FLOC: {obj["Functional Location"]} RID: {obj["Risk ID"]}'
+def _run_drop_unwanted_columns(
+    df: pd.DataFrame, keep_columns: list, text_column: str
+) -> pd.DataFrame:
+    """Remove any columns in the given DataFrame that are not listed in
+    keep_columns.
 
-    # quickgraph_samples.append(
-    #     {"original": _text, "tokens": _tokens, "external_id": _id}
-    # )
+    Args:
+        df (pd.DataFrame): DataFrame to modify.
+        keep_columns (list): The list of columns that should be kept.
+        text_column (str): The text column. This will always be kept.
+
+    Returns:
+        pd.DataFrame: The modified DataFrame.
+    """
+    for c in keep_columns:
+        if c not in df:
+            raise ValueError(
+                f"The column '{c}' was not found in the input dataset. "
+                "Please check all columns listed in the 'keep_columns' list "
+                "exist in the input dataset."
+            )
+
+    cols_before = len(df.columns)
+    df = df[df.columns.intersection(keep_columns + [text_column])]
+    cols_after = len(df.columns)
+    logger.info(f"Dropped {cols_before - cols_after} unwanted columns.")
+
+    return df
 
 
 def _run_drop_duplicates(df: pd.DataFrame, text_column: str) -> pd.DataFrame:
@@ -169,7 +192,8 @@ def _singularise(word: str):
     Attempts to convert a plural word to its singular form.
 
     This function handles common plural endings such as "s", "es", and "ies".
-    Note that it won't handle irregular plurals or all complexities of the English language.
+    Note that it won't handle irregular plurals or all complexities of the
+    English language.
 
 
     Returns:
@@ -205,7 +229,8 @@ def _to_present_tense(verb: str) -> str:
     """
     Attempts to convert a verb to its present tense.
 
-    This function handles common verb endings but won't handle all irregular verbs or complexities of the English language.
+    This function handles common verb endings but won't handle all irregular
+    verbs or complexities of the English language.
 
     Parameters:
     - verb (str): The verb to be converted to present tense.
@@ -246,7 +271,8 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
 
     Parameters:
     - text (str): The string containing potential typos.
-    - corrections_dict (dict): A dictionary mapping incorrect words to their correct versions.
+    - corrections_dict (dict): A dictionary mapping incorrect words to
+    their correct versions.
 
     Returns:
     - str: The corrected string.
@@ -262,40 +288,43 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
     return " ".join(corrected_words)
 
 
-# First, we need to import the 're' module which provides support
-# for regular expressions in Python.
-
-
 def _anonymise_sentence(sentence):
+    """Anonymise the given sentence.
+
+    Args:
+        sentence (str): The sentence to anonymise.
+
+    Returns:
+        str: The anonymised sentence.
+    """
     # The pattern to match asset identifiers is defined as follows:
     #
-    # \b: This represents a word boundary. It ensures that the pattern we're trying
+    # \b: This represents a word boundary. It ensures that the pattern
+    # we're trying
     #     to match is treated as a distinct word, not as part of another word.
     #
     # [A-Za-z]*: This matches zero or more alphabetical characters. It covers
-    #           patterns where an asset identifier might start with letters like "AB" in "AB12".
+    # patterns where an asset identifier might start with letters like "AB" in
+    # "AB12".
     #
     # \d+: This matches one or more numeric characters. It ensures we match
     #      patterns that have numbers in them like "12" in "AB12".
     #
     # [A-Za-z]*: This again matches zero or more alphabetical characters.
-    #           It covers patterns where an asset identifier might end with letters like "a" in "AB12a".
+    # It covers patterns where an asset identifier might end with
+    # letters like "a" in "AB12a".
     #
-    # \b: Another word boundary to ensure the end of our matched pattern is also treated as a distinct word.
+    # \b: Another word boundary to ensure the end of our matched pattern is
+    # also treated as a distinct word.
     pattern = r"\b(\d*[A-Za-z]+\d+[A-Za-z]*|[A-Za-z]*\d+[A-Za-z]+|[A-Za-z]*\d+[A-Za-z]*|[A-Za-z]\d[A-Za-z]\d\d[A-Za-z])\b"
 
-    # Using the re.sub() method, we replace any substring in the 'sentence' that
-    # matches our 'pattern' with the word "AssetID". This function returns a new
-    # string where all the replacements have been made.
+    # Using the re.sub() method, we replace any substring in the 'sentence'
+    # that matches our 'pattern' with the word "AssetID". This function
+    # returns a new string where all the replacements have been made.
     anonymised_sentence = re.sub(pattern, "AssetID", sentence)
 
     # The modified sentence is then returned.
     return anonymised_sentence
-
-
-# To test the function, we provide a sample sentence and call the function.
-# sentence = 'PU1760 not pumping'
-# print(anonymise_sentence(sentence))  # This should output: 'AssetID not pumping'
 
 
 def _remove_extra_spaces(text: str):
