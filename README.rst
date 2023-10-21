@@ -150,10 +150,7 @@ Note that this function does not currently support the use of a config yaml file
 Running Mudlark in Python
 -------------------------
 
-This is a work in progress, but it should be possible to run Mudlark via Python as follows:
-
-.. code-block:: python
-    :linenos:
+This is a work in progress, but it should be possible to run Mudlark via Python as follows__::
 
     from mudlark import normalise_csv
 
