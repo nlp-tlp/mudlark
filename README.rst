@@ -56,7 +56,7 @@ Once Mudlark is installed, you can run it via::
 
 There are currently two functions available:
 
-- ``normalise-csv`` takes an input CSV file and normalises it by running the CSV through a preprocessing pipeline. The text column of the CSV is cleaned using our pipeline-based approach.
+- ``normalise-csv`` takes a CSV file as input. The text column of the CSV is cleaned using our pipeline-based approach.
 - ``normalise-text`` does the same as the above, but on a single string.
 
 ^^^^^^^^^^^^^
