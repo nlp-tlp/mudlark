@@ -48,16 +48,16 @@ Or alternatively
     * - Argument
       - Type
       - Details
-    * - input-path
+    * - `input-path`
       - Text
       - The path of the CSV to normalise. [required]
-    * - output-path
+    * - `output-path`
       - Text
       - The path to save the normalised dataset to once complete. [required]
-    * - text-column
+    * - `text-column`
       - Text
       - The name of the text column, for example'short text', 'risk name', etc. [required]
-    * - output-format
+    * - `output-format`
       - Text
       - The format to save the output. Can be either 'csv' (saves the output as a CSV file) or 'quickgraph' (saves the output as a QuickGraph-compatible JSON file). [default: csv]
 
@@ -70,18 +70,18 @@ There are also several optional arguments:
     * - Argument
       - Type
       - Details
-    * - corrections-path
+    * - `corrections-path`
       - Text
       -  The path containing the CSV to use for corrections. If not specified, the default corrections csv will be used.
-    * - max-words
+    * - `max-words`
       - Integer
       -  If specified, documents with more than the specified number of words in the text column will be dropped.
-    * - drop-duplicates
+    * - `drop-duplicates`
       - Boolean
       - If true, any rows with the same text in the text field as another row will be dropped. [default: False]
-    * - csv-keep-columns
+    * - `csv-keep-columns`
       - Text
       - If specified, only the given columns will be kept in the final output. Columns should be given as a comma separated list surrounded by double quotes, e.g. "col1, col2, col3"... This argument is only relevant when output_format = csv.
-    * - quickgraph-id-columns
+    * - `quickgraph-id-columns`
       - Text
       - If specified, the given column(s) will be used as id columns when generating output for QuickGraph. You may specify one column (for example 'my_id'), or multiple columns separated via comma (for example 'my_id, surname'). This argument is only relevant when output_format = quickgraph.
