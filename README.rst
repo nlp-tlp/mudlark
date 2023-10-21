@@ -19,9 +19,9 @@ Usage
 Mudlark can be used two ways: via the command line, and directly in Python.
 
 
-------------------
-Command line usage
-------------------
+--------------------------------
+Running Mudlark via command line
+--------------------------------
 
 Once Mudlark is installed, you can run it via:
 
@@ -118,3 +118,19 @@ Writing out long commands like the above can be tedious, so we have also made it
 Then, you can read it in via the ``config`` argument::
 
     python -m mudlark normalise-csv --config mudlark.yml
+
+
+-------------------------
+Running Mudlark in Python
+-------------------------
+
+This is a work in progress, but it should be possible to run Mudlark via Python as follows::
+
+.. code-block:: python
+
+    from mudlark import normalise_csv
+
+    normalise_csv('test.csv', 'test_output.csv', 'short_text', 'csv', max_words=15, drop_duplicates=True)
+
+The arguments are exactly the same as when running it via command line.
+
