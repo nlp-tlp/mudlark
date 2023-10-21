@@ -50,7 +50,7 @@ def normalise_csv(
     max_words: Annotated[
         Optional[int],
         typer.Option(
-            help="If true, documents with more than the specified number "
+            help="If specified, documents with more than the specified number "
             "of words in the text column will be dropped."
         ),
     ] = None,
