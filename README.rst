@@ -4,6 +4,29 @@ mudlark
 
 Mudlark is a Python package for automatically cleaning the technical language present across many CSV-based datasets.
 
+It is designed for those who have a CSV dataset with a text column, for example:
+
+.. list-table::
+    :widths: 20 20 20
+    :header-rows: 1
+
+    * - id
+      - short_text
+      - date
+    * - 0
+      - pummp is Broken
+      - 21/02/2022
+    * - 1
+      - seal leaking
+      - 22/03/2022
+    * - 2
+      - repl broken seal
+      - 25/03/2022
+
+Using Mudlark, you can take this dataset and normalise (clean) the text column (in this case, ``short_text``), and save the cleaned CSV to disk. You can also export it to a JSON file that can be readily imported into `QuickGraph <https://quickgraph.tech>`_, so that you can annotate the textual portion of your CSV dataset.
+
+Mudlark also has a few other smaller features, such as the ability to drop rows where the text column contains too many words, the ability to drop duplicate rows, and so on.
+
 ============
 Installation
 ============
