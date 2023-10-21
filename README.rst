@@ -152,8 +152,6 @@ Running Mudlark in Python
 
 This is a work in progress, but it should be possible to run Mudlark via Python as follows::
 
-.. codeblock:: python
-
     from mudlark import normalise_csv
 
     # Normalising a CSV dataset
