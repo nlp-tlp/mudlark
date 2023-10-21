@@ -42,7 +42,7 @@ Or alternatively
 
 
 .. list-table:: Required arguments
-    :widths: 25 25 50
+    :widths: 35 35 50
     :header-rows: 1
 
     * - Argument
@@ -64,7 +64,7 @@ Or alternatively
 There are also several optional arguments:
 
 .. list-table:: Optional arguments
-    :widths: 25 25 50
+    :widths: 35 35 50
     :header-rows: 1
 
     * - Argument
