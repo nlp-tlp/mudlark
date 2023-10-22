@@ -31,6 +31,8 @@ We also provide a simple function to normalise a single piece of text, detailed 
 
 Note that at this stage, the pipeline-based normalisation method that we use is designed for maintenance work orders, but it is also applicable to other domains featuring similar technical language.
 
+Part of the normalisation stage involves replacing any words appearing in a predefined "corrections dictionary" with suitable replacements. You can view this dictionary `here <mudlark/dictionaries/mwo_corrections.csv>`_. We also provide options for using your own corrections dictionary, as detailed below.
+
 ============
 Installation
 ============
