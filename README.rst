@@ -37,7 +37,7 @@ Part of the normalisation stage involves replacing any words appearing in a pred
 Installation
 ============
 
-You can install Mudlark via ``pip``::
+Mudlark is available on PyPI (`link <https://pypi.org/project/mudlark/>`_). You can install Mudlark via ``pip``::
 
     pip install mudlark
 
