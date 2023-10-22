@@ -131,7 +131,7 @@ The command to do this would be::
     python -m mudlark test.csv test_output.csv short_text csv --max-words 15 --drop-duplicates true
 
 ^^^^^^^^^^^^^^^^^^^^^^^
-Using a config.yml file
+Using a configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Writing out long commands can be tedious, so we have also made it possible to read the commands in from a yaml file. Simply create a yaml file (name it something like ``mudlark.yml``), specifying your arguments on each line::
