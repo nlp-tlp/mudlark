@@ -153,7 +153,9 @@ Note that the arguments have underscores (``_``) instead of dashes (``-``) when 
 Running Mudlark in Python
 -------------------------
 
-Mudlark can also be run directly in Python::
+Mudlark can also be run directly in Python:
+
+.. code-block:: python
 
     from mudlark import normalise_csv
 
@@ -162,7 +164,9 @@ Mudlark can also be run directly in Python::
 
 The arguments are exactly the same as when running the function via command line.
 
-Mudlark also provides a simple function for normalising a single piece of text. The first argument is the text to normalise, and the second optional argument allows you to specify your own corrections dictionary::
+Mudlark also provides a simple function for normalising a single piece of text. The first argument is the text to normalise, and the second optional argument allows you to specify your own corrections dictionary:
+
+.. code-block:: python
 
     from mudlark import normalise_text
 
