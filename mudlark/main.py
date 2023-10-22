@@ -8,7 +8,6 @@ from typer_config import use_yaml_config
 from .logger import logger
 from .utils import *
 from .normalisation import normalise_text as normalise, normalise_dataframe
-from .config import *
 
 app = typer.Typer()
 
