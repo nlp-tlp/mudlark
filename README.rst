@@ -54,7 +54,7 @@ Mudlark can be used two ways: via the command line, and directly in Python.
 Running Mudlark via command line
 --------------------------------
 
-You can run install Mudlark via ``pip``::
+You can run Mudlark via::
 
     python -m mudlark <arguments>
 
