@@ -31,13 +31,13 @@ We also provide a simple function to normalise a single piece of text, detailed 
 
 Note that at this stage, the pipeline-based normalisation method that we use is designed for maintenance work orders, but it is also applicable to other domains featuring similar technical language.
 
-Part of the normalisation stage involves replacing any words appearing in a predefined "corrections dictionary" with suitable replacements. You can view this dictionary `here <mudlark/dictionaries/mwo_corrections.csv>`_. We also provide options for using your own corrections dictionary, as detailed below.
+Part of the normalisation stage involves replacing any words appearing in a predefined "corrections dictionary" with suitable replacements. You can view this dictionary `here <https://github.com/nlp-tlp/mudlark/blob/main/mudlark/dictionaries/mwo_corrections.csv>`_. We also provide options for using your own corrections dictionary, as detailed below.
 
 ============
 Installation
 ============
 
-We plan to put Mudlark on PyPI soon, after which you will be able to run::
+You can install Mudlark via ``pip``::
 
     pip install mudlark
 
@@ -130,9 +130,9 @@ The command to do this would be::
 
     python -m mudlark test.csv test_output.csv short_text csv --max-words 15 --drop-duplicates true
 
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 Using a configuration file
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Writing out long commands can be tedious, so we have also made it possible to read the commands in from a yaml file. Simply create a yaml file (name it something like ``mudlark.yml``), specifying your arguments on each line::
 
@@ -152,8 +152,6 @@ Note that the arguments have underscores (``_``) instead of dashes (``-``) when 
 -------------------------
 Running Mudlark in Python
 -------------------------
-
-.. highlight:: python
 
 Mudlark can also be run directly in Python::
 
