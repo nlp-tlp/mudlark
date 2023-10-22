@@ -39,33 +39,28 @@ We plan to put Mudlark on PyPI soon, after which you will be able to run::
 
     pip install mudlark
 
+You can also install Mudlark by cloning this repository and running::
+
+    pip install poetry
+    poetry install
+
 =====
 Usage
 =====
 
 Mudlark can be used two ways: via the command line, and directly in Python.
 
-
 --------------------------------
 Running Mudlark via command line
 --------------------------------
 
-Once Mudlark is installed, you can run it via::
+You can run Mudlark via::
 
-    python -m mudlark <function> <arguments>
-
-There are currently two functions available:
-
-- ``normalise-csv`` takes a CSV file as input. The text column of the CSV is cleaned using our pipeline-based approach.
-- ``normalise-text`` does the same as the above, but on a single string.
-
-^^^^^^^^^^^^^
-normalise_csv
-^^^^^^^^^^^^^
+    python -m mudlark <arguments>
 
 To get a full list of the arguments, you can run::
 
-    python -m mudlark normalise-csv --help
+    python -m mudlark --help
 
 A full list of required arguments and optional arguments are shown in the tables below.
 
@@ -114,9 +109,9 @@ Optional arguments:
       - Text
       - If specified, the given column(s) will be used as id columns when generating output for QuickGraph. You may specify one column (for example 'my_id'), or multiple columns separated via comma (for example 'my_id, surname'). This argument is only relevant when output_format = quickgraph.
 
-""""""""""""""
+^^^^^^^^^^^^^^
 Simple example
-""""""""""""""
+^^^^^^^^^^^^^^
 
 Consider the following example:
 
@@ -131,11 +126,11 @@ Consider the following example:
 
 The command to do this would be::
 
-    python -m mudlark normalise-csv test.csv test_output.csv short_text csv --max-words 15 --drop-duplicates true
+    python -m mudlark test.csv test_output.csv short_text csv --max-words 15 --drop-duplicates true
 
-"""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^
 Using a config.yml file
-"""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Writing out long commands can be tedious, so we have also made it possible to read the commands in from a yaml file. Simply create a yaml file (name it something like ``mudlark.yml``), specifying your arguments on each line::
 
@@ -148,33 +143,8 @@ Writing out long commands can be tedious, so we have also made it possible to re
 
 Then, you can read it in via the ``config`` argument::
 
-    python -m mudlark normalise-csv --config mudlark.yml
+    python -m mudlark --config mudlark.yml
 
-^^^^^^^^^^^^^^
-normalise_text
-^^^^^^^^^^^^^^
-
-The ``normalise_text`` function is a lot simpler - just two arguments:
-
-.. list-table::
-    :widths: 35 25 50
-    :header-rows: 1
-
-    * - Argument
-      - Type
-      - Details
-    * - ``text``
-      - Text
-      - The text to normalise. [required]
-    * - ``corrections-path``
-      - Text
-      - The path containing the CSV to use for corrections. If not specified, the default corrections csv will be used.
-
-Note that this function does not currently support the use of a config yaml file (as it is only two arguments).
-
-As with the ``normalise_csv``, you can get a list of the arguments by using the command::
-
-    python -m mudlark normalise-text --help
 
 -------------------------
 Running Mudlark in Python
@@ -182,15 +152,24 @@ Running Mudlark in Python
 
 .. highlight:: python
 
-This is yet to be tested, but it should be possible to run Mudlark via Python as follows::
+Mudlark can be imported and run as follows::
 
     from mudlark import normalise_csv
 
     # Normalising a CSV dataset
     normalise_csv('test.csv', 'test_output.csv', 'short_text', 'csv', max_words=15, drop_duplicates=True)
 
+The arguments are exactly the same as when running the function via command line.
+
+Mudlark also provides a simple function for normalising a single piece of text::
+
+    from mudlark import normalise_text
+
     # Normalising some text
     normalise_text('pmp is BRokeN')
 
-The arguments are exactly the same as when running the function(s) via command line.
+    # Using your own corrections dictionary
+    normalise_text('pmp is BRokeN', 'my_corrections.csv')
+
+
 

@@ -157,7 +157,6 @@ def normalise_csv(
         )
 
 
-@app.command()
 def normalise_text(
     text: Annotated[
         str,
@@ -181,7 +180,7 @@ def normalise_text(
     """
     corrections_dict = load_corrections_dict(corrections_path)
     normalised_text = normalise(text, corrections_dict)
-    logger.debug(f"{text} -> {normalised_text}")
+    # logger.debug(f"{text} -> {normalised_text}")
     return normalised_text
 
 
