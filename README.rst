@@ -54,7 +54,7 @@ Mudlark can be used two ways: via the command line, and directly in Python.
 Running Mudlark via command line
 --------------------------------
 
-You can run Mudlark via::
+You can run install Mudlark via ``pip``::
 
     python -m mudlark <arguments>
 
@@ -145,6 +145,7 @@ Then, you can read it in via the ``config`` argument::
 
     python -m mudlark --config mudlark.yml
 
+Note that the arguments have underscores (``_``) instead of dashes (``-``) when written in the yaml file.
 
 -------------------------
 Running Mudlark in Python
@@ -152,7 +153,7 @@ Running Mudlark in Python
 
 .. highlight:: python
 
-Mudlark can be imported and run as follows::
+Mudlark can also be run directly in Python::
 
     from mudlark import normalise_csv
 
@@ -161,7 +162,7 @@ Mudlark can be imported and run as follows::
 
 The arguments are exactly the same as when running the function via command line.
 
-Mudlark also provides a simple function for normalising a single piece of text::
+Mudlark also provides a simple function for normalising a single piece of text. The first argument is the text to normalise, and the second optional argument allows you to specify your own corrections dictionary::
 
     from mudlark import normalise_text
 
