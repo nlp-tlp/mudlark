@@ -39,10 +39,6 @@ def normalise_dataframe(
            (only when the 'quickgraph' format is used).
     """
 
-    # Input validation
-    if output_format not in ["csv", "quickgraph"]:
-        raise ValueError("Output format must be either 'csv' or 'quickgraph'.")
-
     # If keep_columns is present, drop all columns not in this list
     # (and always keep the text_column).
     if csv_keep_columns and output_format == "csv":
