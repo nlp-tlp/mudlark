@@ -106,6 +106,9 @@ def normalise_csv(
                 "output_format = csv."
             )
 
+    # Load the CSV into a DataFrame
+    input_df = load_csv_file(input_path)
+
     # If the user has specified any 'id columns',
     # load them into a list of strings.
     if quickgraph_id_columns is not None:
@@ -114,7 +117,7 @@ def normalise_csv(
         # If using QuickGraph output format, make sure the id_columns is
         # present and check that all id columns exist in the dataset.
         if output_format == "quickgraph":
-            validate_quickgraph_id_columns(df, quickgraph_id_columns)
+            validate_quickgraph_id_columns(input_df, quickgraph_id_columns)
         else:
             # If not using QuickGraph, this argument is not relevant - print a
             # warning message.
@@ -128,9 +131,6 @@ def normalise_csv(
     # Load the corrections dictionary.
     # If it is not specified, the default one will be loaded.
     corrections_dict = load_corrections_dict(corrections_path)
-
-    # Load the CSV into a DataFrame
-    input_df = load_csv_file(input_path)
 
     logger.info(f"Normalising csv: '{input_path}'")
 
