@@ -10,7 +10,7 @@ It is designed for the rapid and easy preprocessing of CSV datasets that have a 
     :widths: 20 20 20
     :header-rows: 1
 
-    * - id
+    * - ID
       - short_text
       - date
     * - 0
@@ -143,9 +143,10 @@ Writing out long commands can be tedious, so we have also made it possible to re
     input_path: test.csv
     output_path: test_output.csv
     text_column: short_text
-    output_format: csv
+    max_rows: 100
     max_words: 15
     drop_duplicates: true
+    quickgraph_id_columns: "ID, short_text"
 
 Then, you can read it in via the ``config`` argument::
 
