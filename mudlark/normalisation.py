@@ -2,6 +2,7 @@ import re
 import json
 from typing import List
 import pandas as pd
+from nltk import word_tokenize
 
 from .logger import logger
 
@@ -93,7 +94,7 @@ def normalise(text: str, corrections_dict: dict) -> str:
     _text = _anonymise_sentence(_text)
 
     # 6. Tokenize
-    _tokens = _text.split(" ")  # i.e. ["filters", "-", ...]
+    _tokens = word_tokenize(_text)  # i.e. ["filters", "-", ...]
 
     # 7. Pluralise - Function expects TOKENS not a STRING
     _tokens = [

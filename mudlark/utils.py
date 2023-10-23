@@ -136,7 +136,7 @@ def validate_quickgraph_id_columns(df: pd.DataFrame, id_columns: list[str]):
     Raises:
         ValueError: If id_columns is blank, or any cols are not in the dataset.
     """
-    if id_columns is None:
+    if id_columns is None or len(id_columns) == 0:
         raise ValueError(
             "The id_columns argument must be set when using "
             "the 'quickgraph' output format."
