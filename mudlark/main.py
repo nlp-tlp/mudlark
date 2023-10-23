@@ -94,6 +94,9 @@ def normalise_csv(
         path (str): The path of the CSV to normalise.
         text_column (str): The name of the text column, for example
            'short text', 'risk name', etc.
+
+    Returns
+        pandas.DataFrame: The modified CSV as a DataFrame.
     """
 
     # Input validation
@@ -162,6 +165,8 @@ def normalise_csv(
         save_to_quickgraph_json(
             output_df, output_path, text_column, quickgraph_id_columns
         )
+
+    return output_df
 
 
 def normalise_text(

@@ -93,23 +93,26 @@ def normalise(text: str, corrections_dict: dict) -> str:
     # 5. Anonymise sentence
     _text = _anonymise_sentence(_text)
 
-    # 6. Tokenize
+    # 6. Add space around slash
+    _text = _space_around_slash(_text)
+
+    # 7. Remove extra spaces
+    _text = _remove_extra_spaces(_text)
+
+    # 8. Tokenize
     _tokens = word_tokenize(_text)  # i.e. ["filters", "-", ...]
 
-    # 7. Pluralise - Function expects TOKENS not a STRING
+    # 9. Pluralise - Function expects TOKENS not a STRING
     _tokens = [
         _singularise(token) for token in _tokens
     ]  # i.e. ["filter", "-", ...]
 
-    # 8. Add space around slash
-    _text = _space_around_slash(_text)
-
-    # 9. Align tense - Function expects TOKENS not a STRING
+    # 10. Align tense - Function expects TOKENS not a STRING
     _tokens = [
         _to_present_tense(token) for token in _tokens
     ]  # i.e. [... "accumulat", ...]
 
-    # 10. Recreate _text as string based on processed tokens.
+    # 11. Recreate _text as string based on processed tokens.
     _text = " ".join(_tokens)
 
     return _text
@@ -188,6 +191,12 @@ def _run_drop_long_rows(
         f"words ({rows_before} -> {rows_after})."
     )
     return df
+
+
+def _remove_extra_spaces(text):
+    # The pattern \s+ matches one or more whitespace characters.
+    # It's then replaced with a single space.
+    return re.sub(r"\s+", " ", text)
 
 
 def _singularise(word: str):
