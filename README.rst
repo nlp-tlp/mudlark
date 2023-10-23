@@ -128,7 +128,7 @@ Consider the following example:
 * We are happy to use the default corrections CSV.
 * We want to drop rows where the ``short_text`` column has > 15 words.
 * We want to drop duplicates.
-* We will use the "ID" and "short_text" columns to form an "ID" in our output QuickGraph data.
+* We will use the "ID" and "short_text" columns to form an identifier in our output QuickGraph data.
 
 The command to do this would be::
 
@@ -165,7 +165,7 @@ Mudlark can also be run directly in Python:
     from mudlark import normalise_csv
 
     # Normalising a CSV dataset
-    normalise_csv('test.csv', 'test_output.csv', 'short_text', 'csv', max_words=15, drop_duplicates=True)
+    normalise_csv('test.csv', 'test_output.csv', 'short_text', max_rows=100, max_words=15, drop_duplicates=True, quickgraph_id_columns: "ID, short_text")
 
 The arguments are exactly the same as when running the function via command line.
 
