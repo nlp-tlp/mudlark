@@ -95,7 +95,7 @@ Optional arguments:
     * - ``output-format``
       - Text
       - The format to save the output. Can be either 'quickgraph' (saves the output as a QuickGraph-compatible JSON file) or 'csv' (saves the output as a CSV file). [default: quickgraph]
-    * - ``max_rows``
+    * - ``max-rows``
       - Integer
       - If specified, the output will be randomly sampled to contain the specified maximum number of rows.
     * - ``corrections-path``

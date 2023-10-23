@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mudlark"
-version = "0.1.9"
+version = "0.1.10"
 description = ""
 authors = ["Michael Stewart <michael.stewart.webdev@gmail.com>"]
 readme = "README.rst"
