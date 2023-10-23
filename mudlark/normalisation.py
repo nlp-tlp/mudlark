@@ -5,8 +5,6 @@ import pandas as pd
 
 from .logger import logger
 
-from .utils import validate_quickgraph_id_columns
-
 
 def normalise_dataframe(
     df: pd.DataFrame,
@@ -54,13 +52,13 @@ def normalise_dataframe(
 
     # Run the normalisation over each row, on the text column
     df[text_column] = df[text_column].apply(
-        lambda x: normalise_text(x, corrections_dict)
+        lambda x: normalise(x, corrections_dict)
     )
 
     return df
 
 
-def normalise_text(text: str, corrections_dict: dict) -> str:
+def normalise(text: str, corrections_dict: dict) -> str:
     """Normalise the given text using a pipeline-based approach.
 
     Args:
@@ -358,3 +356,30 @@ def _remove_commas(text):
         str: The modified string.
     """
     return text.replace(",", " ")
+
+
+def validate_quickgraph_id_columns(df: pd.DataFrame, id_columns: list[str]):
+    """Validate that the id_columns are present, and that they all exist
+    in the dataset.
+    This is only checked when using the QuickGraph output format, as it
+    requires an "external_id" that is comprised of the concatenation of these
+    id_columns.
+
+    Args:
+        df (pd.DataFrame): The DataFrame.
+        id_columns (list[str]): The list of id columns.
+
+    Raises:
+        ValueError: If id_columns is blank, or any cols are not in the dataset.
+    """
+    if id_columns is None:
+        raise ValueError(
+            "The id_columns argument must be set when using "
+            "the 'quickgraph' output format."
+        )
+    for col in id_columns:
+        if col not in df:
+            raise ValueError(
+                f"The column '{col}' that is listed in the "
+                "id_columns does not exist in the dataset."
+            )

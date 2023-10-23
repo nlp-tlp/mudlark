@@ -7,7 +7,7 @@ from typer_config import use_yaml_config
 
 from .logger import logger
 from .utils import *
-from .normalisation import normalise_text as normalise, normalise_dataframe
+from .normalisation import normalise, normalise_dataframe
 
 app = typer.Typer()
 
