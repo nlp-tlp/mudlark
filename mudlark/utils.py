@@ -18,7 +18,9 @@ def load_csv_file(path: str):
     Returns:
         pd.DataFrame: The pandas dataframe.
     """
-    df = pd.read_csv(path, engine="python", on_bad_lines="skip")
+    df = pd.read_csv(
+        path, engine="python", on_bad_lines="skip", skipinitialspace=True
+    )
     return df
 
 
@@ -40,12 +42,8 @@ def load_corrections_dict(path: str = None) -> Dict:
             "mwo_corrections.csv",
         )
 
-    corrections_dict = {}
-    with open(path, "r") as f:
-        reader = csv.reader(f)
-        for row in reader:
-            wrong, correct = [w.strip() for w in row]
-            corrections_dict[wrong] = correct
+    df = load_csv_file(path)
+    corrections_dict = df.set_index(df.columns[0])[df.columns[1]].to_dict()
 
     return corrections_dict
 
