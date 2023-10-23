@@ -33,7 +33,7 @@ def normalise_csv(
     ],
     output_format: Annotated[
         str,
-        typer.Argument(
+        typer.Option(
             help="The format to save the output. Can be either 'csv' (saves "
             "the output as a CSV file) or 'quickgraph' (saves the output as "
             "a QuickGraph-compatible JSON file)."

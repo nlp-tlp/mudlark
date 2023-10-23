@@ -82,9 +82,6 @@ A full list of required arguments and optional arguments are shown in the tables
     * - ``text-column``
       - Text
       - The name of the text column, for example'short text', 'risk name', etc. [required]
-    * - ``output-format``
-      - Text
-      - The format to save the output. Can be either 'csv' (saves the output as a CSV file) or 'quickgraph' (saves the output as a QuickGraph-compatible JSON file). [default: csv]
 
 Optional arguments:
 
@@ -95,6 +92,9 @@ Optional arguments:
     * - Argument
       - Type
       - Details
+    * - ``output-format``
+      - Text
+      - The format to save the output. Can be either 'csv' (saves the output as a CSV file) or 'quickgraph' (saves the output as a QuickGraph-compatible JSON file). [default: csv]
     * - ``corrections-path``
       - Text
       - The path containing the CSV to use for corrections. If not specified, the default corrections csv will be used.
