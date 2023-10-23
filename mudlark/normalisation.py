@@ -12,6 +12,7 @@ def normalise_dataframe(
     text_column: str,
     corrections_dict: dict,
     output_format: str,
+    max_rows: int = None,
     max_words: int = None,
     drop_duplicates: bool = False,
     csv_keep_columns: list = None,
@@ -24,8 +25,10 @@ def normalise_dataframe(
         output_path (str): The path to save the output to.
         text_column (str): The column containing the text to normalise.
         corrections_dict (dict): The dictionary of corrections.
-        output_format (str, optional): The output format. Can be either
+        output_format (str): The output format. Can be either
            'csv' or 'quickgraph'.
+        max_rows (int, optional): If present, randomly sample and truncate
+           to max_rows.
         max_words (int, optional): If present, drop all rows where
            the text field contains > max_words words.
         drop_duplicates (bool, optional): If present, any rows where the
@@ -54,6 +57,11 @@ def normalise_dataframe(
     df[text_column] = df[text_column].apply(
         lambda x: normalise(x, corrections_dict)
     )
+
+    # If max rows, randomly sample
+    if max_rows:
+        df = df.sample(n=max_rows)
+        logger.info(f"Randomly sampled to {len(df)} rows.")
 
     return df
 

@@ -38,7 +38,14 @@ def normalise_csv(
             "the output as a CSV file) or 'quickgraph' (saves the output as "
             "a QuickGraph-compatible JSON file)."
         ),
-    ] = "csv",
+    ] = "quickgraph",
+    max_rows: Annotated[
+        Optional[int],
+        typer.Option(
+            help="If specified, the output will be randomly sampled to "
+            "contain the specified maximum number of rows."
+        ),
+    ] = None,
     corrections_path: Annotated[
         Optional[str],
         typer.Option(
@@ -141,6 +148,7 @@ def normalise_csv(
         text_column,
         corrections_dict,
         output_format,
+        max_rows,
         max_words,
         drop_duplicates,
         csv_keep_columns,
