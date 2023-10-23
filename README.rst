@@ -123,15 +123,16 @@ Consider the following example:
 * We are interested in normalising the dataset called ``test.csv``.
 * We want to save the output to ``test_output.csv``.
 * The text column within this csv file is called ``short_text``.
-* We want to save it as a ``csv`` file.
+* We want to save it as a QuickGraph-compatible JSON file (the default output format).
+* We want to limit the output to 100 rows (randomly sampled).
 * We are happy to use the default corrections CSV.
 * We want to drop rows where the ``short_text`` column has > 15 words.
 * We want to drop duplicates.
-* We are happy to keep all of the columns in the output.
+* We will use the "ID" and "short_text" columns to form an "ID" in our output QuickGraph data.
 
 The command to do this would be::
 
-    python -m mudlark test.csv test_output.csv short_text csv --max-words 15 --drop-duplicates true
+    python -m mudlark test.csv test_output.csv "short_text" --max-rows 100 --max-words 15 --drop-duplicates true --quickgraph-id-columns "ID, short_text"
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 Using a configuration file
