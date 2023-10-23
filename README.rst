@@ -100,7 +100,7 @@ Optional arguments:
       - If specified, the output will be randomly sampled to contain the specified maximum number of rows.
     * - ``corrections-path``
       - Text
-      - The path containing the CSV to use for corrections. If not specified, the default corrections csv will be used.
+      - The path containing the CSV to use for corrections. If not specified, the default corrections csv will be used. If using your own CSV file, it should have two columns. The first column contains the incorrect term, the second column contains the replacement for that term. Your file should have no header row. See `here <https://github.com/nlp-tlp/mudlark/blob/main/mudlark/dictionaries/mwo_corrections.csv>`_ for the expected file format.
     * - ``max-words``
       - Integer
       -  If specified, documents with more than the specified number of words in the text column will be dropped.

@@ -40,8 +40,13 @@ def load_corrections_dict(path: str = None) -> Dict:
             "mwo_corrections.csv",
         )
 
-    corrections_csv = load_csv_file(path)
-    corrections_dict = corrections_csv.set_index("wrong")["correct"].to_dict()
+    corrections_dict = {}
+    with open(path, "r") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            wrong, correct = [w.strip() for w in row]
+            corrections_dict[wrong] = correct
+
     return corrections_dict
 
 
