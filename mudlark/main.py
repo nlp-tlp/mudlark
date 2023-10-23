@@ -31,13 +31,6 @@ def normalise_csv(
             "'short text', 'risk name', etc."
         ),
     ],
-    corrections_path: Annotated[
-        Optional[str],
-        typer.Option(
-            help="The path containing the CSV to use for corrections. "
-            "If not specified, the default corrections csv will be used."
-        ),
-    ] = None,
     output_format: Annotated[
         str,
         typer.Argument(
@@ -46,6 +39,13 @@ def normalise_csv(
             "a QuickGraph-compatible JSON file)."
         ),
     ] = "csv",
+    corrections_path: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The path containing the CSV to use for corrections. "
+            "If not specified, the default corrections csv will be used."
+        ),
+    ] = None,
     max_words: Annotated[
         Optional[int],
         typer.Option(
