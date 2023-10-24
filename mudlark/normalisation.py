@@ -82,16 +82,16 @@ def normalise(text: str, corrections_dict: dict) -> str:
     # 2. Add space around hypen
     _text = _add_space_around_hyphen(_text)
 
-    # 3. Add space around slash
-    _text = _space_around_slash(_text)
-
-    # 4. Remove commas
+    # 3. Remove commas
     _text = _remove_commas(_text)
 
-    # 5. Fix typos
+    # 4. Fix typos
     _text = _correct_typos(
         text=_text, corrections_dict=corrections_dict
     )  # i.e. "filters - filters accumulated due to contamination."
+
+    # 5. Add space around slash
+    _text = _space_around_slash(_text)
 
     # 6. Anonymise sentence
     _text = _anonymise_sentence(_text)
