@@ -176,7 +176,7 @@ Mudlark also provides a simple function for normalising a single piece of text. 
     from mudlark import normalise_text
 
     # Normalising some text
-    normalise_text('pmp is BRokeN')
+    normalise_text('pmp is  BRokeN')
 
     # Using your own corrections dictionary
     normalise_text('pmp is BRokeN', 'my_corrections.csv')
