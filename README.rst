@@ -2,6 +2,9 @@
 mudlark
 *******
 
+.. image:: https://github.com/nlp-tlp/badges/blob/main/mudlark-pylint-badge.svg
+   :target: https://github.com/nlp-tlp/mudlark/actions/workflows/run-pylint.yml
+
 Mudlark is a Python package for automatically cleaning the technical language present across many CSV-based datasets.
 
 It is designed for the rapid and easy preprocessing of CSV datasets that have a text column, for example:
