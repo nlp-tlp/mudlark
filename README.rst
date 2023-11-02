@@ -1,6 +1,12 @@
 Mudlark
 *******
 
+.. image:: https://github.com/nlp-tlp/mudlark/actions/workflows/run-tests.yml/badge.svg
+   :target: https://github.com/nlp-tlp/mudlark/actions/workflows/run-tests.yml
+
+.. image:: https://coveralls.io/repos/github/nlp-tlp/puggle/badge.svg?branch=main
+   :target: https://coveralls.io/github/nlp-tlp/puggle?branch=main
+
 .. image:: https://github.com/nlp-tlp/badges/blob/main/mudlark-pylint-badge.svg
    :target: https://github.com/nlp-tlp/mudlark/actions/workflows/run-pylint.yml
 

@@ -37,6 +37,9 @@ jobs:
       - name: Install Poetry dependencies
         run: poetry install --with test
 
+      - name: Install NLTK Punkt tokeniser (required for tests)
+        run: poetry run python -m nltk.downloader punkt
+
       - name: Run tests
         run: poetry run pytest --cov=${{ github.event.repository.name }}
 
