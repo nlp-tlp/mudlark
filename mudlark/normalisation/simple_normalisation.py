@@ -1,74 +1,24 @@
-"""Code for running the normalisation."""
+"""Functions for normalising text."""
 import re
-import pandas as pd
 from nltk import word_tokenize
-
-from .logger import logger
-
-
-def normalise_dataframe(
-    df: pd.DataFrame,
-    text_column: str,
-    corrections_dict: dict,
-    output_format: str,
-    max_rows: int = None,
-    max_words: int = None,
-    drop_duplicates: bool = False,
-    csv_keep_columns: list = None,
-) -> pd.DataFrame:
-    """Normalise the given dataframe.
-
-    Args:
-        df (pd.DataFrame): The dataframe to normalise.
-        text_column (str): The column containing the text to normalise.
-        corrections_dict (dict): The dictionary of corrections.
-        output_format (str): The output format. Can be either
-           'csv' or 'quickgraph'.
-        max_rows (int, optional): If present, randomly sample and truncate
-           to max_rows.
-        max_words (int, optional): If present, drop all rows where
-           the text field contains > max_words words.
-        drop_duplicates (bool, optional): If present, any rows where the
-           specified column is a duplicate will be dropped.
-        csv_keep_columns (list, optional): If present, only the given columns
-           will be kept in the output.
-    """
-
-    # If keep_columns is present, drop all columns not in this list
-    # (and always keep the text_column).
-    if csv_keep_columns and output_format == "csv":
-        df = _run_drop_unwanted_columns(df, csv_keep_columns, text_column)
-
-    # If drop_duplicates is True, drop rows accordingly
-    if drop_duplicates:
-        df = _run_drop_duplicates(df, text_column)
-
-    # If max_words is present, drop all rows with > max_words
-    if max_words:
-        df = _run_drop_long_rows(df, text_column, max_words)
-
-    # Run the normalisation over each row, on the text column
-    df[text_column] = df[text_column].apply(
-        lambda x: normalise(x, corrections_dict)
-    )
-
-    # If max rows, randomly sample
-    if max_rows:
-        df = df.sample(n=max_rows)
-        logger.info(f"Randomly sampled to {len(df)} rows.")
-
-    return df
+from mudlark.utils import load_corrections_dict
 
 
-def normalise(text: str, corrections_dict: dict) -> str:
-    """Normalise the given text using a pipeline-based approach.
+def simple_normalise(text: str, corrections_path: str = None):
+    """Run the 'simple' normalisation over the given text.
 
     Args:
         text (str): The text to normalise.
+        corrections_path (str, optional): The path containing the
+           corrections dictionary. If not present, will use the default.
 
     Returns:
         str: The normalised text.
+
     """
+
+    corrections_dict = load_corrections_dict(corrections_path)
+
     # 1. Lowercase text
     text = text.lower()
 
@@ -95,95 +45,20 @@ def normalise(text: str, corrections_dict: dict) -> str:
     # 8. Tokenize
     tokens = word_tokenize(text)  # i.e. ["filters", "-", ...]
 
-    # 9. Pluralise - Function expects TOKENS not a STRING
-    tokens = [
-        _singularise(token) for token in tokens
-    ]  # i.e. ["filter", "-", ...]
-
-    # 10. Align tense - Function expects TOKENS not a STRING
+    # 9. Align tense - Function expects TOKENS not a STRING
     tokens = [
         _to_present_tense(token) for token in tokens
     ]  # i.e. [... "accumulat", ...]
+
+    # 10. Pluralise - Function expects TOKENS not a STRING
+    tokens = [
+        _singularise(token) for token in tokens
+    ]  # i.e. ["filter", "-", ...]
 
     # 11. Recreate _text as string based on processed tokens.
     text = " ".join(tokens)
 
     return text
-
-
-def _run_drop_unwanted_columns(
-    df: pd.DataFrame, keep_columns: list, text_column: str
-) -> pd.DataFrame:
-    """Remove any columns in the given DataFrame that are not listed in
-    keep_columns.
-
-    Args:
-        df (pd.DataFrame): DataFrame to modify.
-        keep_columns (list): The list of columns that should be kept.
-        text_column (str): The text column. This will always be kept.
-
-    Returns:
-        pd.DataFrame: The modified DataFrame.
-    """
-    for c in keep_columns:
-        if c not in df:
-            raise ValueError(
-                f"The column '{c}' was not found in the input dataset. "
-                "Please check all columns listed in the 'keep_columns' list "
-                "exist in the input dataset."
-            )
-
-    cols_before = len(df.columns)
-    df = df[df.columns.intersection(keep_columns + [text_column])]
-    cols_after = len(df.columns)
-    logger.info(f"Dropped {cols_before - cols_after} unwanted columns.")
-
-    return df
-
-
-def _run_drop_duplicates(df: pd.DataFrame, text_column: str) -> pd.DataFrame:
-    """Remove duplicate rows.
-
-    Args:
-        df (pd.DataFrame): DataFrame to modify.
-        text_column (str): The text column (duplicates of this column
-           will be dropped).
-
-    Returns:
-        pd.DataFrame: The modified DataFrame.
-    """
-    rows_before = len(df)
-    df = df.drop_duplicates(subset=text_column, keep="first")
-    rows_after = len(df)
-    logger.info(
-        f"Dropped {rows_before - rows_after} duplicate rows "
-        f"({rows_before} -> {rows_after})."
-    )
-    return df
-
-
-def _run_drop_long_rows(
-    df: pd.DataFrame, text_column: str, max_words: int
-) -> pd.DataFrame:
-    """Remove rows where the text column has > max_words.
-
-    Args:
-        df (pd.DataFrame): DataFrame to modify.
-        text_column (str): The text column (duplicates of this column
-           will be dropped).
-        max_words (int): The max words allowed in the text column.
-
-    No Longer Returned:
-        pd.DataFrame: The modified DataFrame.
-    """
-    rows_before = len(df)
-    df = df[df[text_column].apply(lambda x: len(x.split()) < max_words)]
-    rows_after = len(df)
-    logger.info(
-        f"Dropped {rows_before - rows_after} rows with > {max_words} "
-        f"words ({rows_before} -> {rows_after})."
-    )
-    return df
 
 
 def _remove_extra_spaces(text):
@@ -226,6 +101,8 @@ def _singularise(word: str):
     Returns:
         str: The singular form of the given word.
     """
+    if len(word) <= 3:  # Don't singularise short words (was, is etc)
+        return word
     if word.endswith("ss"):  # e.g., "glass" -> "glass"
         return word
     if word.endswith("ies") and len(word) > 3:  # e.g., "berries" -> "berry"
@@ -268,11 +145,6 @@ def _to_present_tense(verb: str) -> str:
     if verb in irregulars:
         return irregulars[verb]
 
-    # Handling common verb endings
-    if verb.endswith("ormed"):
-        return verb
-    if verb.endswith("med"):
-        return verb[:-3]
     return verb
 
 

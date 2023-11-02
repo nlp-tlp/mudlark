@@ -5,14 +5,15 @@ from typer_config import use_yaml_config
 
 from .logger import logger
 from .utils import (
-    load_csv_file,
-    load_corrections_dict,
     parse_list,
-    save_to_csv,
-    save_to_quickgraph_json,
     validate_quickgraph_id_columns,
+    drop_unwanted_columns,
+    drop_duplicates as run_drop_duplicates,
+    drop_long_rows,
+    load_csv_file,
+    save_to_quickgraph_json,
 )
-from .normalisation import normalise, normalise_dataframe
+from .normalisation import simple_normalise
 
 app = typer.Typer()
 
@@ -143,33 +144,41 @@ def normalise_csv(
                     "output_format = quickgraph."
                 )
 
-    # Load the corrections dictionary.
-    # If it is not specified, the default one will be loaded.
-    corrections_dict = load_corrections_dict(corrections_path)
-
     logger.info(f"Normalising csv: '{input_path}'")
 
-    # Normalise the DataFrame
-    output_df = normalise_dataframe(
-        input_df,
-        text_column,
-        corrections_dict,
-        output_format,
-        max_rows,
-        max_words,
-        drop_duplicates,
-        csv_keep_columns,
+    # If keep_columns is present, drop all columns not in this list
+    # (and always keep the text_column).
+    if csv_keep_columns and output_format == "csv":
+        df = drop_unwanted_columns(df, csv_keep_columns, text_column)
+
+    # If drop_duplicates is True, drop rows accordingly
+    if drop_duplicates:
+        df = run_drop_duplicates(df, text_column)
+
+    # If max_words is present, drop all rows with > max_words
+    if max_words:
+        df = drop_long_rows(df, text_column, max_words)
+
+    # Run the normalisation over each row, on the text column
+    df[text_column] = df[text_column].apply(
+        lambda x: simple_normalise(x, corrections_path)
     )
+
+    # If max rows, randomly sample
+    if max_rows:
+        df = df.sample(n=max_rows)
+        logger.info(f"Randomly sampled to {len(df)} rows.")
 
     # Save the output to disk
     if output_format == "csv":
-        save_to_csv(output_df, output_path)
+        df.to_csv(output_path, index=False)
+        logger.info(f"Saved output to {output_path}.")
     elif output_format == "quickgraph":
         save_to_quickgraph_json(
-            output_df, output_path, text_column, quickgraph_id_columns
+            df, output_path, text_column, quickgraph_id_columns
         )
 
-    return output_df
+    return df
 
 
 def normalise_text(
@@ -193,10 +202,9 @@ def normalise_text(
            corrections. If not specified, the default corrections csv
            will be used.
     """
-    corrections_dict = load_corrections_dict(corrections_path)
-    normalised_text = normalise(text, corrections_dict)
-    # logger.debug(f"{text} -> {normalised_text}")
-    return normalised_text
+    text = simple_normalise(text, corrections_path)
+
+    return text
 
 
 if __name__ == "__main__":

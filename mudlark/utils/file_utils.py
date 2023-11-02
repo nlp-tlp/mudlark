@@ -1,11 +1,10 @@
-"""Utility functions (loading files etc)."""
+"""Functions for saving and loading files."""
 import os
-import json
 import pathlib
+import json
 from typing import Dict
 import pandas as pd
-
-from .logger import logger
+from mudlark.logger import logger
 
 
 def load_csv_file(path: str):
@@ -36,7 +35,7 @@ def load_corrections_dict(path: str = None) -> Dict:
 
     if path == "" or path is None:
         path = os.path.join(
-            pathlib.Path(__file__).parent.resolve(),
+            pathlib.Path(__file__).parent.resolve().parent.resolve(),
             "dictionaries",
             "mwo_corrections.csv",
         )
@@ -45,29 +44,6 @@ def load_corrections_dict(path: str = None) -> Dict:
     corrections_dict = df.set_index(df.columns[0])[df.columns[1]].to_dict()
 
     return corrections_dict
-
-
-def parse_list(s: str):
-    """Parse the given comma-separated string into a list.
-
-    Args:
-        s (str): The string to parse.
-
-    Returns:
-        list: The list.
-    """
-    return [i.strip() for i in s.split(",")]
-
-
-def save_to_csv(df: pd.DataFrame, output_path: str):
-    """Save the DataFrame to the given path as a csv.
-
-    Args:
-        df (pd.DataFrame): The DataFrame to save.
-        output_path (str): The path to save it to.
-    """
-    df.to_csv(output_path, index=False)
-    logger.info(f"Saved output to {output_path}.")
 
 
 def save_to_quickgraph_json(
@@ -122,30 +98,3 @@ def _compile_external_id(row: pd.Series, id_columns: list[str]):
         str: An id.
     """
     return ", ".join([f"{col}: {row[col]}" for col in id_columns])
-
-
-def validate_quickgraph_id_columns(df: pd.DataFrame, id_columns: list[str]):
-    """Validate that the id_columns are present, and that they all exist
-    in the dataset.
-    This is only checked when using the QuickGraph output format, as it
-    requires an "external_id" that is comprised of the concatenation of these
-    id_columns.
-
-    Args:
-        df (pd.DataFrame): The DataFrame.
-        id_columns (list[str]): The list of id columns.
-
-    Raises:
-        ValueError: If id_columns is blank, or any cols are not in the dataset.
-    """
-    if id_columns is None or len(id_columns) == 0:
-        raise ValueError(
-            "The id_columns argument must be set when using "
-            "the 'quickgraph' output format."
-        )
-    for col in id_columns:
-        if col not in df:
-            raise ValueError(
-                f"The column '{col}' that is listed in the "
-                "id_columns does not exist in the dataset."
-            )
