@@ -1,5 +1,3 @@
-import os
-import sys
 import typer
 from typing import List
 from typing_extensions import Annotated, Optional
