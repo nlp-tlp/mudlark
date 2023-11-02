@@ -208,4 +208,4 @@ def normalise_text(
 
 
 if __name__ == "__main__":
-    app()
+    app()  # pragma: no cover
