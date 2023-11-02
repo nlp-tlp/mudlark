@@ -1,5 +1,4 @@
-*******
-mudlark
+Mudlark
 *******
 
 .. image:: https://github.com/nlp-tlp/badges/blob/main/mudlark-pylint-badge.svg
@@ -36,7 +35,6 @@ Note that at this stage, the pipeline-based normalisation method that we use is 
 
 Part of the normalisation stage involves replacing any words appearing in a predefined "corrections dictionary" with suitable replacements. You can view this dictionary `here <https://github.com/nlp-tlp/mudlark/blob/main/mudlark/dictionaries/mwo_corrections.csv>`_. We also provide options for using your own corrections dictionary, as detailed below.
 
-============
 Installation
 ============
 
@@ -49,13 +47,11 @@ You can also install Mudlark by cloning this repository and running::
     pip install poetry
     poetry install
 
-=====
 Usage
 =====
 
 Mudlark can be used two ways: via the command line, and directly in Python.
 
---------------------------------
 Running Mudlark via command line
 --------------------------------
 
@@ -117,7 +113,6 @@ Optional arguments:
       - Text
       - If specified, the given column(s) will be used as id columns when generating output for QuickGraph. You may specify one column (for example 'my_id'), or multiple columns separated via comma (for example 'my_id, surname'). This argument is only relevant when output_format = quickgraph.
 
-^^^^^^^^^^^^^^
 Simple example
 ^^^^^^^^^^^^^^
 
@@ -137,7 +132,6 @@ The command to do this would be::
 
     python -m mudlark test.csv test_output.csv "short_text" --max-rows 100 --max-words 15 --drop-duplicates true --quickgraph-id-columns "ID, short_text"
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^
 Using a configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -157,7 +151,6 @@ Then, you can read it in via the ``config`` argument::
 
 Note that the arguments have underscores (``_``) instead of dashes (``-``) when written in the yaml file.
 
--------------------------
 Running Mudlark in Python
 -------------------------
 
@@ -185,4 +178,11 @@ Mudlark also provides a simple function for normalising a single piece of text. 
     normalise_text('pmp is BRokeN', 'my_corrections.csv')
 
 
+Running the tests
+-----------------
 
+If you would like to run the test cases, you can use::
+
+    poetry run pytest --cov mudlark --cov-report html
+
+The coverage report will be saved into the `htmlcov` folder.

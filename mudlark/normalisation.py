@@ -70,45 +70,45 @@ def normalise(text: str, corrections_dict: dict) -> str:
         str: The normalised text.
     """
     # 1. Lowercase text
-    _text = text.lower()
+    text = text.lower()
 
     # 2. Add space around hypen
-    _text = _add_space_around_hyphen(_text)
+    text = _add_space_around_hyphen(text)
 
     # 3. Remove commas
-    _text = _remove_commas(_text)
+    text = _remove_commas(text)
 
     # 4. Fix typos
-    _text = _correct_typos(
-        text=_text, corrections_dict=corrections_dict
+    text = _correct_typos(
+        text=text, corrections_dict=corrections_dict
     )  # i.e. "filters - filters accumulated due to contamination."
 
     # 5. Add space around slash
-    _text = _space_around_slash(_text)
+    text = _space_around_slash(text)
 
     # 6. Anonymise sentence
-    _text = _anonymise_sentence(_text)
+    text = _anonymise_sentence(text)
 
     # 7. Remove extra spaces
-    _text = _remove_extra_spaces(_text)
+    text = _remove_extra_spaces(text)
 
     # 8. Tokenize
-    _tokens = word_tokenize(_text)  # i.e. ["filters", "-", ...]
+    tokens = word_tokenize(text)  # i.e. ["filters", "-", ...]
 
     # 9. Pluralise - Function expects TOKENS not a STRING
-    _tokens = [
-        _singularise(token) for token in _tokens
+    tokens = [
+        _singularise(token) for token in tokens
     ]  # i.e. ["filter", "-", ...]
 
     # 10. Align tense - Function expects TOKENS not a STRING
-    _tokens = [
-        _to_present_tense(token) for token in _tokens
+    tokens = [
+        _to_present_tense(token) for token in tokens
     ]  # i.e. [... "accumulat", ...]
 
     # 11. Recreate _text as string based on processed tokens.
-    _text = " ".join(_tokens)
+    text = " ".join(tokens)
 
-    return _text
+    return text
 
 
 def _run_drop_unwanted_columns(

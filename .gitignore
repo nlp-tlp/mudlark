@@ -162,3 +162,5 @@ cython_debug/
 
 mudlark.yml
 corrections2.csv
+.pylintrc
+htmlcov/*
