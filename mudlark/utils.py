@@ -1,10 +1,9 @@
+"""Utility functions (loading files etc)."""
 import os
-import csv
 import json
 import pathlib
+from typing import Dict
 import pandas as pd
-from typing import List, Dict
-import re
 
 from .logger import logger
 
@@ -93,7 +92,7 @@ def save_to_quickgraph_json(
 
     """
     output_data = []
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         obj = {
             "original": row[text_column],
             "tokens": row[text_column].split(),
@@ -101,7 +100,7 @@ def save_to_quickgraph_json(
         }
         output_data.append(obj)
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output_data, f, indent=2)
     logger.info(f"Saved output to {output_path}.")
 

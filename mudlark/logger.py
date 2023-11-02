@@ -1,3 +1,4 @@
+"""A logger that is a bit nicer than the default Python logger."""
 import sys
 from loguru import logger
 

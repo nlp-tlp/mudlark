@@ -1,6 +1,5 @@
+"""Code for running the normalisation."""
 import re
-import json
-from typing import List
 import pandas as pd
 from nltk import word_tokenize
 
@@ -9,7 +8,6 @@ from .logger import logger
 
 def normalise_dataframe(
     df: pd.DataFrame,
-    output_path: str,
     text_column: str,
     corrections_dict: dict,
     output_format: str,
@@ -17,13 +15,11 @@ def normalise_dataframe(
     max_words: int = None,
     drop_duplicates: bool = False,
     csv_keep_columns: list = None,
-    quickgraph_id_columns: list = None,
 ) -> pd.DataFrame:
     """Normalise the given dataframe.
 
     Args:
         df (pd.DataFrame): The dataframe to normalise.
-        output_path (str): The path to save the output to.
         text_column (str): The column containing the text to normalise.
         corrections_dict (dict): The dictionary of corrections.
         output_format (str): The output format. Can be either
@@ -36,9 +32,6 @@ def normalise_dataframe(
            specified column is a duplicate will be dropped.
         csv_keep_columns (list, optional): If present, only the given columns
            will be kept in the output.
-        quickgraph_id_columns (list, optional): If present, the given columns
-           will be used to form a composite id key to include in the output
-           (only when the 'quickgraph' format is used).
     """
 
     # If keep_columns is present, drop all columns not in this list
@@ -194,6 +187,14 @@ def _run_drop_long_rows(
 
 
 def _remove_extra_spaces(text):
+    """Remove any superfluous spaces in the given text.
+
+    Args:
+        text (str): The text to remove the spaces from.
+
+    Returns:
+        str: The updated text.
+    """
     # The pattern \s+ matches one or more whitespace characters.
     # It's then replaced with a single space.
     return re.sub(r"\s+", " ", text)
@@ -227,14 +228,13 @@ def _singularise(word: str):
     """
     if word.endswith("ss"):  # e.g., "glass" -> "glass"
         return word
-    elif word.endswith("ies") and len(word) > 3:  # e.g., "berries" -> "berry"
+    if word.endswith("ies") and len(word) > 3:  # e.g., "berries" -> "berry"
         return word[:-3] + "y"
-    elif word.endswith("xes") and len(word) > 2:  # e.g., "boxes" -> "box"
+    if word.endswith("xes") and len(word) > 2:  # e.g., "boxes" -> "box"
         return word[:-2]
-    elif word.endswith("s") and len(word) > 1:  # e.g., "cats" -> "cat"
+    if word.endswith("s") and len(word) > 1:  # e.g., "cats" -> "cat"
         return word[:-1]
-    else:
-        return word
+    return word
 
 
 def _to_present_tense(verb: str) -> str:
@@ -271,10 +271,9 @@ def _to_present_tense(verb: str) -> str:
     # Handling common verb endings
     if verb.endswith("ormed"):
         return verb
-    elif verb.endswith("med"):
+    if verb.endswith("med"):
         return verb[:-3]
-    else:
-        return verb
+    return verb
 
 
 def _correct_typos(text: str, corrections_dict: dict) -> str:
@@ -303,32 +302,36 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
 def _anonymise_sentence(sentence):
     """Anonymise the given sentence.
 
+    The pattern to match asset identifiers is defined as follows:
+
+    b: This represents a word boundary. It ensures that the pattern
+    we're trying to match is treated as a distinct word, not as part
+    of another word.
+
+    [A-Za-z]*: This matches zero or more alphabetical characters. It covers
+    patterns where an asset identifier might start with letters like "AB" in
+    "AB12".
+
+    d+: This matches one or more numeric characters. It ensures we match
+    patterns that have numbers in them like "12" in "AB12".
+
+    [A-Za-z]*: This again matches zero or more alphabetical characters.
+    It covers patterns where an asset identifier might end with
+    letters like "a" in "AB12a".
+
+    b: Another word boundary to ensure the end of our matched pattern is
+    also treated as a distinct word.
+
     Args:
         sentence (str): The sentence to anonymise.
 
     Returns:
         str: The anonymised sentence.
     """
-    # The pattern to match asset identifiers is defined as follows:
-    #
-    # \b: This represents a word boundary. It ensures that the pattern
-    # we're trying
-    #     to match is treated as a distinct word, not as part of another word.
-    #
-    # [A-Za-z]*: This matches zero or more alphabetical characters. It covers
-    # patterns where an asset identifier might start with letters like "AB" in
-    # "AB12".
-    #
-    # \d+: This matches one or more numeric characters. It ensures we match
-    #      patterns that have numbers in them like "12" in "AB12".
-    #
-    # [A-Za-z]*: This again matches zero or more alphabetical characters.
-    # It covers patterns where an asset identifier might end with
-    # letters like "a" in "AB12a".
-    #
-    # \b: Another word boundary to ensure the end of our matched pattern is
-    # also treated as a distinct word.
-    pattern = r"\b(\d*[A-Za-z]+\d+[A-Za-z]*|[A-Za-z]*\d+[A-Za-z]+|[A-Za-z]*\d+[A-Za-z]*|[A-Za-z]\d[A-Za-z]\d\d[A-Za-z])\b"
+    pattern = (
+        r"\b(\d*[A-Za-z]+\d+[A-Za-z]*|[A-Za-z]*\d+[A-Za-z]+|"
+        r"[A-Za-z]*\d+[A-Za-z]*|[A-Za-z]\d[A-Za-z]\d\d[A-Za-z])\b"
+    )
 
     # Using the re.sub() method, we replace any substring in the 'sentence'
     # that matches our 'pattern' with the word "AssetID". This function
@@ -339,13 +342,15 @@ def _anonymise_sentence(sentence):
     return anonymised_sentence
 
 
-def _remove_extra_spaces(text: str):
-    # The pattern \s+ matches one or more whitespace characters.
-    # It's then replaced with a single space.
-    return re.sub(r"\s+", " ", text)
-
-
 def _add_space_around_hyphen(text: str):
+    """Add space characters around a hyphen character.
+
+    Args:
+        text (str): The text to modify.
+
+    Returns:
+        str: The updated text.
+    """
     # The pattern searches for a non-space character before and after a hyphen.
     # The replaced text will ensure spaces exist around the hyphen.
     return re.sub(r"(?<=[^\s])-|-(?=[^\s])", " - ", text)

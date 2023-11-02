@@ -1,10 +1,17 @@
+"""The main functions of Mudlark, i.e. normalise_csv and normalise_text."""
 import typer
-from typing import List
 from typing_extensions import Annotated, Optional
 from typer_config import use_yaml_config
 
 from .logger import logger
-from .utils import *
+from .utils import (
+    load_csv_file,
+    load_corrections_dict,
+    parse_list,
+    save_to_csv,
+    save_to_quickgraph_json,
+    validate_quickgraph_id_columns,
+)
 from .normalisation import normalise, normalise_dataframe
 
 app = typer.Typer()
@@ -145,7 +152,6 @@ def normalise_csv(
     # Normalise the DataFrame
     output_df = normalise_dataframe(
         input_df,
-        output_path,
         text_column,
         corrections_dict,
         output_format,
@@ -153,7 +159,6 @@ def normalise_csv(
         max_words,
         drop_duplicates,
         csv_keep_columns,
-        quickgraph_id_columns,
     )
 
     # Save the output to disk
