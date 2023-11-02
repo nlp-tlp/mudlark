@@ -1,0 +1,73 @@
+[
+  {
+    "tokens": [
+      "broken"
+    ],
+    "original": "broken",
+    "external_id": "text: broken"
+  },
+  {
+    "tokens": [
+      "replace"
+    ],
+    "original": "replace",
+    "external_id": "text: replace"
+  },
+  {
+    "tokens": [
+      "x",
+      "/",
+      "x"
+    ],
+    "original": "x / x",
+    "external_id": "text: x / x"
+  },
+  {
+    "tokens": [
+      "glass"
+    ],
+    "original": "glass",
+    "external_id": "text: glass"
+  },
+  {
+    "tokens": [
+      "slurry"
+    ],
+    "original": "slurry",
+    "external_id": "text: slurry"
+  },
+  {
+    "tokens": [
+      "box"
+    ],
+    "original": "box",
+    "external_id": "text: box"
+  },
+  {
+    "tokens": [
+      "pump",
+      "busted"
+    ],
+    "original": "pump busted",
+    "external_id": "text: pump busted"
+  },
+  {
+    "tokens": [
+      "engine",
+      "is",
+      "broken"
+    ],
+    "original": "engine is broken",
+    "external_id": "text: engine is broken"
+  },
+  {
+    "tokens": [
+      "a",
+      "leak",
+      "is",
+      "formed"
+    ],
+    "original": "a leak is formed",
+    "external_id": "text: a leak is formed"
+  }
+]

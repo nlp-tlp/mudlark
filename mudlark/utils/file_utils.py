@@ -50,7 +50,7 @@ def save_to_quickgraph_json(
     df: pd.DataFrame,
     output_path: str,
     text_column: str,
-    id_columns: list[str],
+    id_columns: list[str] = None,
 ):
     """Save the DataFrame to the given path.
 
@@ -63,17 +63,18 @@ def save_to_quickgraph_json(
         df (pd.DataFrame): The DataFrame to save.
         output_path (str): The path to save it to.
         text_column (str): The text column.
-        id_columns (list[str]): The list of id columns to use as the
+        id_columns (list[str], optional): The list of id columns to use as the
            composite id (to save in the 'external_id' field)
 
     """
     output_data = []
     for _, row in df.iterrows():
         obj = {
-            "original": row[text_column],
             "tokens": row[text_column].split(),
-            "external_id": _compile_external_id(row, id_columns),
+            "original": row[text_column],
         }
+        if id_columns:
+            obj["external_id"] = _compile_external_id(row, id_columns)
         output_data.append(obj)
 
     with open(output_path, "w", encoding="utf-8") as f:

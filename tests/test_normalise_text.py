@@ -1,3 +1,4 @@
+"""Tests for the normalise_text function."""
 import pytest
 from mudlark import normalise_text
 

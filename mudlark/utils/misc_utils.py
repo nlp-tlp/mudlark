@@ -1,5 +1,6 @@
 """Misc utility functions."""
 import pandas as pd
+from mudlark.logger import logger
 
 
 def parse_list(s: str):
@@ -11,6 +12,8 @@ def parse_list(s: str):
     Returns:
         list: The list.
     """
+    if s is None:
+        return []
     return [i.strip() for i in s.split(",")]
 
 
@@ -26,13 +29,16 @@ def validate_quickgraph_id_columns(df: pd.DataFrame, id_columns: list[str]):
         id_columns (list[str]): The list of id columns.
 
     Raises:
-        ValueError: If id_columns is blank, or any cols are not in the dataset.
+        ValueError: If any cols are not in the dataset.
     """
-    if id_columns is None or len(id_columns) == 0:
-        raise ValueError(
-            "The id_columns argument must be set when using "
-            "the 'quickgraph' output format."
+    if len(id_columns) == 0:
+        logger.warning(
+            "The quickgraph_id_columns is not set, so the output "
+            "will not include an original_id column that maps back to your "
+            "original dataset. Consider setting quickgraph_id_columns as "
+            "discussed in the README."
         )
+        return
     for col in id_columns:
         if col not in df:
             raise ValueError(

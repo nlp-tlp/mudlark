@@ -24,12 +24,6 @@ def normalise_csv(
     input_path: Annotated[
         str, typer.Argument(help="The path of the CSV to normalise.")
     ],
-    output_path: Annotated[
-        str,
-        typer.Argument(
-            help="The path to save the normalised dataset to once complete."
-        ),
-    ],
     text_column: Annotated[
         str,
         typer.Argument(
@@ -37,6 +31,12 @@ def normalise_csv(
             "'short text', 'risk name', etc."
         ),
     ],
+    output_path: Annotated[
+        str,
+        typer.Option(
+            help="The path to save the normalised dataset to once complete."
+        ),
+    ] = None,
     output_format: Annotated[
         str,
         typer.Option(
@@ -123,26 +123,24 @@ def normalise_csv(
             )
 
     # Load the CSV into a DataFrame
-    input_df = load_csv_file(input_path)
+    df = load_csv_file(input_path)
 
-    # If the user has specified any 'id columns',
+    quickgraph_id_columns_list = None
+    # If the user has specified any 'quickgraph id columns',
     # load them into a list of strings.
-    if quickgraph_id_columns is not None:
-        quickgraph_id_columns = parse_list(quickgraph_id_columns)
-
+    if output_format == "quickgraph":
         # If using QuickGraph output format, make sure the id_columns is
         # present and check that all id columns exist in the dataset.
-        if output_format == "quickgraph":
-            validate_quickgraph_id_columns(input_df, quickgraph_id_columns)
-        else:
-            # If not using QuickGraph, this argument is not relevant - print a
-            # warning message.
-            if quickgraph_id_columns:
-                logger.warning(
-                    "You appear to have set 'quickgraph_id_columns', but this "
-                    "is being ignored as this argument is only relevant when "
-                    "output_format = quickgraph."
-                )
+        quickgraph_id_columns_list = parse_list(quickgraph_id_columns)
+        validate_quickgraph_id_columns(df, quickgraph_id_columns_list)
+    elif quickgraph_id_columns:
+        # If not using QuickGraph, this argument is not relevant - print a
+        # warning message.
+        logger.warning(
+            "You appear to have set 'quickgraph_id_columns', but this "
+            "is being ignored as this argument is only relevant when "
+            "output_format = 'quickgraph'."
+        )
 
     logger.info(f"Normalising csv: '{input_path}'")
 
@@ -169,15 +167,16 @@ def normalise_csv(
         df = df.sample(n=max_rows)
         logger.info(f"Randomly sampled to {len(df)} rows.")
 
+    if not output_path:
+        return df
     # Save the output to disk
     if output_format == "csv":
         df.to_csv(output_path, index=False)
         logger.info(f"Saved output to {output_path}.")
     elif output_format == "quickgraph":
         save_to_quickgraph_json(
-            df, output_path, text_column, quickgraph_id_columns
+            df, output_path, text_column, quickgraph_id_columns_list
         )
-
     return df
 
 

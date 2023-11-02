@@ -81,9 +81,6 @@ A full list of required arguments and optional arguments are shown in the tables
     * - ``input-path``
       - Text
       - The path of the CSV to normalise. [required]
-    * - ``output-path``
-      - Text
-      - The path to save the normalised dataset to once complete. [required]
     * - ``text-column``
       - Text
       - The name of the text column, for example'short text', 'risk name', etc. [required]
@@ -100,6 +97,9 @@ Optional arguments:
     * - ``output-format``
       - Text
       - The format to save the output. Can be either 'quickgraph' (saves the output as a QuickGraph-compatible JSON file) or 'csv' (saves the output as a CSV file). [default: quickgraph]
+    * - ``output-path``
+      - Text
+      - The path to save the normalised dataset to once complete.
     * - ``max-rows``
       - Integer
       - If specified, the output will be randomly sampled to contain the specified maximum number of rows.
@@ -136,7 +136,7 @@ Consider the following example:
 
 The command to do this would be::
 
-    python -m mudlark test.csv test_output.csv "short_text" --max-rows 100 --max-words 15 --drop-duplicates true --quickgraph-id-columns "ID, short_text"
+    python -m mudlark test.csv "short_text" --output-path test_output.csv --max-rows 100 --max-words 15 --drop-duplicates true --quickgraph-id-columns "ID, short_text"
 
 Using a configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
