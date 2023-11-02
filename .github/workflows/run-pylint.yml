@@ -23,6 +23,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pylint anybadge
+      - name: Download .pylintrc file
+        uses: suisei-cn/actions-download-file@v1.4.0
+        id: pylintrc
+        with:
+          url: "https://raw.githubusercontent.com/nlp-tlp/badges/main/.pylintrc"
       - name: Run Pylint
         run: |
           pylint ${{ github.event.repository.name }} --output pylint.log --exit-zero
