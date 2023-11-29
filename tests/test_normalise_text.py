@@ -16,10 +16,11 @@ from mudlark import normalise_text
         ("enGiNe was broken", "engine is broken"),  # present tense
         ("a leak was Formed", "a leak is formed"),  # present tense
 
+        ("Test Tube", "test tube"), # 1. Lowercase text
         ("test-tube", "test - tube"), # 2. Add space around hypen
         ("test,tube", "test tube"), # 3. Remove commas
         ("a/c leakin", "air conditioner leak"), # 4. fix typos 
-        ("test/tube", "test tube"), # 5. Add space around slash
+        ("test/tube", "test / tube"), # 5. Add space around slash
         
     ],
 )
