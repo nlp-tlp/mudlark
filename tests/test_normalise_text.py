@@ -15,6 +15,12 @@ from mudlark import normalise_text
         ("pumps busted", "pump busted"),  # pluralisation
         ("enGiNe was broken", "engine is broken"),  # present tense
         ("a leak was Formed", "a leak is formed"),  # present tense
+
+        ("test-tube", "test - tube"), # 2. Add space around hypen
+        ("test,tube", "test tube"), # 3. Remove commas
+        ("a/c leakin", "air conditioner leak"), # 4. fix typos 
+        ("test/tube", "test tube"), # 5. Add space around slash
+        
     ],
 )
 def test_normalise_text_default(test_input, expected):
