@@ -21,7 +21,12 @@ from mudlark import normalise_text
         ("test,tube", "test tube"), # 3. Remove commas
         ("a/c leakin", "air conditioner leak"), # 4. fix typos 
         ("test/tube", "test / tube"), # 5. Add space around slash
-        
+        ("check ABX32ad and DDdkL204ddd", "check AssetID and AssetID"), # 6. Anonymise sentence
+        ("  test     tube   and   test  ", "test tube and test"), # 7. Remove extra spaces
+        ("metal pipe was broken", "metal pipe is broken") # 9. Align tense 
+        # ("the glasses holds foxes and has holes", "the glasse hold fox and has hole") # 10. Pluralise 
+
+
     ],
 )
 def test_normalise_text_default(test_input, expected):
