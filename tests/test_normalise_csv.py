@@ -4,7 +4,7 @@ import filecmp
 import pandas as pd
 from mudlark import normalise_csv
 
-
+# tests for quickgraph output format
 @pytest.mark.parametrize(
     "input_path, expected_output_path, text_field, options",
     [
@@ -18,13 +18,20 @@ from mudlark import normalise_csv
             {"quickgraph_id_columns": "text"},
         ),
         (
-            "simple.csv",
+            "simple_with_duplicates.csv",
             "simple_normalised_qg.json",
             "text",
             {"drop_duplicates": "yes"},
         ),
+        # Testing max_words
         (
             "simple.csv",
+            "simple_normalised_qg.json",
+            "text",
+            {"max_words": 100},
+        ),
+        (
+            "simple_with_long_rows.csv",
             "simple_normalised_qg.json",
             "text",
             {"max_words": 100},
@@ -35,6 +42,13 @@ from mudlark import normalise_csv
             "simple_normalised_qg.json",
             "text",
             {"csv_keep_columns": "hello"},
+        ),
+        # Testing new corrections dictionary 
+        (
+            "test_corrections.csv",
+            "test_corrections_normalised_qg.json",
+            "text",
+            {"corrections_path": "dictionary_test_corrections.csv"},
         ),
     ],
     indirect=["input_path", "expected_output_path"],
@@ -62,7 +76,7 @@ def test_normalise_csv_to_quickgraph(
 
     assert filecmp.cmp(output_path, expected_output_path)
 
-
+# tests for csv output format
 @pytest.mark.parametrize(
     "input_path, expected_output_path, text_field, options",
     [
@@ -113,7 +127,7 @@ def test_normalise_csv_to_csv(
 
     assert filecmp.cmp(output_path, expected_output_path)
 
-
+# tests for error handling with quickgraph output format 
 @pytest.mark.parametrize(
     "input_path, text_field, options, error_type, error_snippet",
     [
@@ -153,6 +167,7 @@ def test_normalise_csv_to_quickgraph_errors(
     assert error_snippet in str(e)
 
 
+# tests for error handling with csv output format 
 @pytest.mark.parametrize(
     "input_path, text_field, options, error_type, error_snippet",
     [
