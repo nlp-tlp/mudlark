@@ -43,13 +43,7 @@ from mudlark import normalise_csv
             "text",
             {"csv_keep_columns": "hello"},
         ),
-        # Testing new corrections dictionary 
-        (
-            "test_corrections.csv",
-            "test_corrections_normalised_qg.json",
-            "text",
-            {"corrections_path": "dictionary_test_corrections.csv"},
-        ),
+        
     ],
     indirect=["input_path", "expected_output_path"],
 )
@@ -225,3 +219,44 @@ def test_normalise_csv_to_df(input_path, text_field, options, num_rows):
 
     df = normalise_csv(input_path, text_field, **options)
     assert df.shape[0] == num_rows
+
+
+
+# tests for custom corrections dictionary
+@pytest.mark.parametrize(
+    "input_path, expected_output_path, text_field, test_correction_dictionary_path, options",
+    [
+        # Testing new corrections dictionary 
+        (
+            "test_corrections.csv",
+            "test_corrections_normalised_qg.json",
+            "text",
+            "dictionary_test_corrections.csv",
+            {}
+        ),
+    ],
+    indirect=["input_path", "expected_output_path", "test_correction_dictionary_path"],
+)
+def test_normalise_custom_corrections(
+    input_path, expected_output_path, text_field, test_correction_dictionary_path, options, tmp_path
+):
+    """Ensure the normalise_text function works as expected with a custom corrections dictionary.
+    At the moment, this always uses simple_normalise().
+
+    Args:
+        input_path (str): Path of input dataset.
+        expected_output_path (str): Path of the expected output dataset.
+        text_field (str): The text field in the CSV.
+        test_correction_dictionary_path (str): Path of corrections dictionary.
+        options (dict): The optional args for the normalise_csv function.
+        tmp_path (object): pytest's tmp_path fixture (where the data will be
+           temporarily saved).
+
+    Deleted Parameters:
+        input_dataset_path (str): The input path.
+        output_dataset_path (str): The path of the expected output.
+    """
+    output_path = tmp_path / "out.json"
+    normalise_csv(input_path, text_field, output_path=output_path, corrections_path=test_correction_dictionary_path, **options)
+
+    assert filecmp.cmp(output_path, expected_output_path)
