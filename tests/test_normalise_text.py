@@ -29,8 +29,9 @@ from mudlark import normalise_text
         # ("PLC", "programmable logic controller"),   # ! csv file should be lower case plc
         # ("ROM", "run of mine"),                     # ! csv file should be lower case rom
         # ("BFWP", "boiler feed water pump"),         # ! csv file should be lower case bfwp
-        # ("air / con", "air / con"),   # ! csv file ?
-        # ("air - con", "air - con"),   # ! csv file ?
+        # ("air / con", "air conditioner"),   # ! csv file cannot deal with spaces 
+        # ("air - con", "air conditioner"),   # ! csv file cannot deal with spaces 
+        # ("ac unit", "air conditioner"),   # ! csv file cannot deal with spaces 
         
         # [5] Test cases for adding spaces around slashes
         ("X/X", "x / x"),
@@ -53,15 +54,15 @@ from mudlark import normalise_text
         ("gw had innadequate", "gland water has inadequate"),
         
         # [9] Test cases for aligning tense (regular verbs)
-        # ("cpu running", "central processing unit running"), # ! running -> run ?
+        # ("cpu running", "central processing unit run"), # ! running -> run ?
         # ("worked played busted", "work play bust"), # ! no code for aligning regular verbs 
         
         # [10] Test cases for pluralising
         ("glass", "glass"),  # double s endings
-        ("slurries", "slurry"),  # ies > ry
+        ("slurries", "slurry"),  # ies -> ry
         ("boxes", "box"),  # xes -> x
         ("pumps busted", "pump busted"), # ! busted -> bust ?
-        # ("the glasses holds foxes and has holes", "the glasse hold fox and has hole") # ! glases -> glass ?
+        # ("the glasses holds foxes", "the glass hold fox") # ! glases -> glass ?
     ],
 )
 def test_normalise_text_default(test_input, expected):
