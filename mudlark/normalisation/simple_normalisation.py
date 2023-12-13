@@ -187,9 +187,16 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
     "The wall was cracked."
     """
 
-    words = text.split()
-    corrected_words = [corrections_dict.get(word, word) for word in words]
-    return " ".join(corrected_words)
+    corrected_text = text
+    for incorrect, corrected in corrections_dict.items():
+        incorrect, corrected = str(incorrect), str(corrected)
+        if incorrect in corrected_text:
+            if len(incorrect) < len(corrected):
+                index = corrected_text.find(incorrect)
+                if corrected_text[index:index+len(corrected)] == corrected:
+                    continue 
+            corrected_text = corrected_text.replace(incorrect, corrected)
+    return corrected_text
 
 
 def _anonymise_sentence(sentence):

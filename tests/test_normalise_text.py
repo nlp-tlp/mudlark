@@ -15,8 +15,9 @@ from mudlark import normalise_text
         ("PLC", "programmable logic controller"),
         ("ROM", "run of mine"),
         ("BFWP", "boiler feed water pump"),
-        ("air / con", "air conditioner"),   # ! csv file cannot deal with spaces 
-        ("air - con", "air conditioner"),   # ! csv file cannot deal with spaces 
+        ("air / con", "air conditioner"),
+        ("air - con", "air conditioner"),
+        ("two way", "two way radio"),
         
         # [2] Test cases for converting text to lowercase
         ("UpperCase", "uppercase"),
