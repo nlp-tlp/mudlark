@@ -227,7 +227,6 @@ def test_normalise_csv_to_csv_errors(
 
     Args:
         input_path (str): The path of the input file.
-        expected_output_path (str): The path of the expected output file.
         text_field (str): The text field in the CSV.
         options (dict): The optional args for the normalise_csv function.
         error_type (Exception): The type of expected Exception.
@@ -239,7 +238,8 @@ def test_normalise_csv_to_csv_errors(
         print(e)
     assert error_snippet in str(e)
 
-# [5] Test for setting number of randomly sampled rows in quickgraph format
+# [5] Test for setting number of randomly sampled rows in quickgraph format, and checks 
+# normalise_csv also outputs a dataframe as expected when no output_path is specified
 @pytest.mark.parametrize(
     "input_path, text_field, options, num_rows",
     [
@@ -257,6 +257,7 @@ def test_normalise_csv_to_df(
         input_path (str): The path of the input file.
         text_field (str): The text field in the CSV.
         options (dict): The optional args for the normalise_csv function.
+        num_rows (int): The number of expected rows in the output quickgraph. 
     """
 
     df = normalise_csv(input_path, text_field, **options)
@@ -273,13 +274,16 @@ def test_normalise_csv_to_df(
 )
 def test_normalise_csv_to_csv_max_rows(
     input_path, text_field, options, num_rows, tmp_path):
-    """Ensure normalise_csv also outputs a dataframe as expected when no
-    output_path is specified.
+    """Ensure the normalise_text function works as expected.
+    At the moment, this always uses simple_normalise().
 
     Args:
         input_path (str): The path of the input file.
         text_field (str): The text field in the CSV.
         options (dict): The optional args for the normalise_csv function.
+        num_rows (int): The number of expected rows in the output CSV.
+        tmp_path (object): pytest's tmp_path fixture (where the data will be
+           temporarily saved).
     """
     output_path = tmp_path / "out.csv"
     normalise_csv(input_path, text_field, output_path=output_path, output_format="csv", **options)
@@ -322,6 +326,7 @@ def test_normalise_custom_corrections(
         input_path (str): Path of input dataset.
         expected_output_path (str): Path of the expected output dataset.
         text_field (str): The text field in the CSV.
+        out_format (str): the format of output file, either 'quickgraph' or 'csv'.
         test_correction_dictionary_path (str): Path of corrections dictionary.
         options (dict): The optional args for the normalise_csv function.
         tmp_path (object): pytest's tmp_path fixture (where the data will be
