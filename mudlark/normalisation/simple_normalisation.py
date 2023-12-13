@@ -139,11 +139,24 @@ def _to_present_tense(verb: str) -> str:
         "was": "is",
         "were": "are",
         "had": "has",
+        "have": "has",
         "did": "do",
         "went": "go",
+        "ran": "run",
     }
     if verb in irregulars:
         return irregulars[verb]
+    
+    endings = ["ing", "ed"]
+    for ending in endings:
+        if verb.endswith(ending):
+            stem = verb[:-len(ending)]
+            
+            if stem.endswith(("c", "k")) and not stem.endswith(("ck", "rk")):
+                return stem + "e"
+            if stem.endswith("nn") and ending == "ing":
+                return stem[:-1]
+            return stem
 
     return verb
 

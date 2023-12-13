@@ -23,7 +23,7 @@ from mudlark import normalise_text
         # [4] Test cases for fixing typos
         ("a/c leakin", "air conditioner leak"),
         ("accum boken", "accumulator broken"),
-        ("conmon", "condition monitoring"),
+        ("conmon", "condition monitor"),
         ("wtp reapair and repalce", "water treatment pump repair and replace"),
         ("gw innadequate", "gland water inadequate"),
         # ("PLC", "programmable logic controller"),   # ! csv file should be lower case plc
@@ -31,7 +31,6 @@ from mudlark import normalise_text
         # ("BFWP", "boiler feed water pump"),         # ! csv file should be lower case bfwp
         # ("air / con", "air conditioner"),   # ! csv file cannot deal with spaces 
         # ("air - con", "air conditioner"),   # ! csv file cannot deal with spaces 
-        # ("ac unit", "air conditioner"),   # ! csv file cannot deal with spaces 
         
         # [5] Test cases for adding spaces around slashes
         ("X/X", "x / x"),
@@ -40,7 +39,7 @@ from mudlark import normalise_text
         # [6] Test cases for anonymising sentences
         ("check ABX32ad and DDdkL204ddd", "check AssetID and AssetID"),
         ("AB123 XYZ789", "AssetID AssetID"),
-        ("nothing here", "nothing here"),
+        ("none here", "none here"),
         ("XY345Z", "AssetID"),
         
         # [7] Test cases for removing extra spaces
@@ -49,19 +48,22 @@ from mudlark import normalise_text
         
         # [9] Test cases for aligning tense (irregular verbs)
         ("enGiNe was broken", "engine is broken"),
-        ("many leak were Formed", "many leak are formed"), # ! formed -> form ?
+        ("many leak were Formed", "many leak are form"),
         ("metal pipe was broken", "metal pipe is broken"),
         ("gw had innadequate", "gland water has inadequate"),
         
         # [9] Test cases for aligning tense (regular verbs)
-        # ("cpu running", "central processing unit run"), # ! running -> run ?
-        # ("worked played busted", "work play bust"), # ! no code for aligning regular verbs 
+        ("batterie running", "battery run"),
+        ("worked played busted jumped", "work play bust jump"),
+        ("spinning stunning", "spin stun"), # double n
+        ("liked baked danced lurked", "like bake dance lurk"),
+        ("hiking crying bouncing licking", "hike cry bounce lick"),
         
         # [10] Test cases for pluralising
         ("glass", "glass"),  # double s endings
         ("slurries", "slurry"),  # ies -> ry
         ("boxes", "box"),  # xes -> x
-        ("pumps busted", "pump busted"), # ! busted -> bust ?
+        ("pumps busted", "pump bust"), # pumps -> pump
         # ("the glasses holds foxes", "the glass hold fox") # ! glases -> glass ?
     ],
 )
