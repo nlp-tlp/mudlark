@@ -6,32 +6,32 @@ from mudlark import normalise_text
 @pytest.mark.parametrize(
     "test_input,expected",
     [
-        # [1] Test cases for converting text to lowercase
+        # [1] Test cases for fixing typos
+        ("a/c leakin", "air conditioner leak"),
+        ("accum boken", "accumulator broken"),
+        ("conmon", "condition monitoring"),
+        ("wtp reapair and repalce", "water treatment pump repair and replace"),
+        ("gw innadequate", "gland water inadequate"),
+        ("PLC", "programmable logic controller"),
+        ("ROM", "run of mine"),
+        ("BFWP", "boiler feed water pump"),
+        ("air / con", "air conditioner"),   # ! csv file cannot deal with spaces 
+        ("air - con", "air conditioner"),   # ! csv file cannot deal with spaces 
+        
+        # [2] Test cases for converting text to lowercase
         ("UpperCase", "uppercase"),
         ("MixedCaSe", "mixedcase"),
         ("BROKEN", "broken"),
         ("Test Tube", "test tube"),
         
-        # [2] Test cases for adding spaces around hyphens
+        # [3] Test cases for adding spaces around hyphens
         ("test-tube", "test - tube"),
         ("word-hyphen-word", "word - hyphen - word"),
         
-        # [3] Test cases for removing commas
+        # [4] Test cases for removing commas
         ("test,tube", "test tube"),
         ("engine,pump,pipe", "engine pump pipe"),
-        
-        # [4] Test cases for fixing typos
-        ("a/c leakin", "air conditioner leak"),
-        ("accum boken", "accumulator broken"),
-        ("conmon", "condition monitor"),
-        ("wtp reapair and repalce", "water treatment pump repair and replace"),
-        ("gw innadequate", "gland water inadequate"),
-        # ("PLC", "programmable logic controller"),   # ! csv file should be lower case plc
-        # ("ROM", "run of mine"),                     # ! csv file should be lower case rom
-        # ("BFWP", "boiler feed water pump"),         # ! csv file should be lower case bfwp
-        # ("air / con", "air conditioner"),   # ! csv file cannot deal with spaces 
-        # ("air - con", "air conditioner"),   # ! csv file cannot deal with spaces 
-        
+    
         # [5] Test cases for adding spaces around slashes
         ("X/X", "x / x"),
         ("test/tube", "test / tube"),

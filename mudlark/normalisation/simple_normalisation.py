@@ -18,20 +18,20 @@ def simple_normalise(text: str, corrections_path: str = None):
     """
 
     corrections_dict = load_corrections_dict(corrections_path)
-
-    # 1. Lowercase text
-    text = text.lower()
-
-    # 2. Add space around hypen
-    text = _add_space_around_hyphen(text)
-
-    # 3. Remove commas
-    text = _remove_commas(text)
-
-    # 4. Fix typos
+    
+    # 1. Fix typos
     text = _correct_typos(
         text=text, corrections_dict=corrections_dict
     )  # i.e. "filters - filters accumulated due to contamination."
+
+    # 2. Lowercase text
+    text = text.lower()
+
+    # 3. Add space around hypen
+    text = _add_space_around_hyphen(text)
+
+    # 4. Remove commas
+    text = _remove_commas(text)
 
     # 5. Add space around slash
     text = _space_around_slash(text)
@@ -47,7 +47,7 @@ def simple_normalise(text: str, corrections_path: str = None):
 
     # 9. Align tense - Function expects TOKENS not a STRING
     tokens = [
-        _to_present_tense(token) for token in tokens
+        _to_present_tense(verb=token, corrections_dict=corrections_dict) for token in tokens
     ]  # i.e. [... "accumulat", ...]
 
     # 10. Pluralise - Function expects TOKENS not a STRING
@@ -114,7 +114,7 @@ def _singularise(word: str):
     return word
 
 
-def _to_present_tense(verb: str) -> str:
+def _to_present_tense(verb: str, corrections_dict: dict) -> str:
     """
     Attempts to convert a verb to its present tense.
 
@@ -147,16 +147,24 @@ def _to_present_tense(verb: str) -> str:
     if verb in irregulars:
         return irregulars[verb]
     
-    endings = ["ing", "ed"]
-    for ending in endings:
-        if verb.endswith(ending):
-            stem = verb[:-len(ending)]
-            
-            if stem.endswith(("c", "k")) and not stem.endswith(("ck", "rk")):
-                return stem + "e"
-            if stem.endswith("nn") and ending == "ing":
-                return stem[:-1]
-            return stem
+    # Ignore keywords from corrections_dict
+    keywords_set = set()
+    for terms in corrections_dict.values():
+        words = str(terms).split()
+        keywords_set.update(words)
+    keywords = list(keywords_set)
+    
+    if verb not in keywords:
+        endings = ["ing", "ed"]
+        for ending in endings:
+            if verb.endswith(ending):
+                stem = verb[:-len(ending)]
+                if len(stem) > 1:
+                    if stem.endswith(("c", "k")) and not stem.endswith(("ck", "rk")):
+                        return stem + "e"
+                    if stem.endswith("nn") and ending == "ing":
+                        return stem[:-1]
+                return stem
 
     return verb
 
