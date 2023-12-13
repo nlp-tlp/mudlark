@@ -4,7 +4,7 @@ import filecmp
 import pandas as pd
 from mudlark import normalise_csv
 
-# tests for quickgraph output format
+# [1] tests for quickgraph output format
 @pytest.mark.parametrize(
     "input_path, expected_output_path, text_field, options",
     [
@@ -71,7 +71,7 @@ def test_normalise_csv_to_quickgraph(
 
     assert filecmp.cmp(output_path, expected_output_path)
 
-# tests for csv output format
+# [2] tests for csv output format
 @pytest.mark.parametrize(
     "input_path, expected_output_path, text_field, options",
     [
@@ -142,7 +142,7 @@ def test_normalise_csv_to_csv(
 
     assert filecmp.cmp(output_path, expected_output_path)
 
-# tests for error handling with quickgraph output format 
+# [3] tests for error handling with quickgraph output format 
 @pytest.mark.parametrize(
     "input_path, text_field, options, error_type, error_snippet",
     [
@@ -159,6 +159,27 @@ def test_normalise_csv_to_csv(
             {"output_format": "not_a_real_format"},
             ValueError,
             "Output format must be either",
+        ),
+        (
+            "simple.csv",
+            "text",
+            {"corrections_path": "not_an_existing_path"},
+            FileNotFoundError,
+            "No such file or directory",
+        ),
+        (
+            "simple.csv",
+            "text",
+            {"max_rows": "not_an_integer"},
+            TypeError,
+            "not supported between instances of 'str' and 'int'",
+        ),
+        (
+            "simple.csv",
+            "text",
+            {"max_rows": 100},
+            ValueError,
+            "Cannot take a larger sample than population when 'replace=False'",
         ),
     ],
     indirect=["input_path"],
@@ -181,7 +202,7 @@ def test_normalise_csv_to_quickgraph_errors(
         normalise_csv(input_path, text_field, **options)
     assert error_snippet in str(e)
 
-# tests for error handling with csv output format 
+# [4] tests for error handling with csv output format 
 @pytest.mark.parametrize(
     "input_path, text_field, options, error_type, error_snippet",
     [
@@ -218,7 +239,7 @@ def test_normalise_csv_to_csv_errors(
         print(e)
     assert error_snippet in str(e)
 
-# Test for setting number of randomly sampled rows in quickgraph format
+# [5] Test for setting number of randomly sampled rows in quickgraph format
 @pytest.mark.parametrize(
     "input_path, text_field, options, num_rows",
     [
@@ -241,7 +262,7 @@ def test_normalise_csv_to_df(
     df = normalise_csv(input_path, text_field, **options)
     assert df.shape[0] == num_rows
 
-# Test for setting number of randomly sampled rows in csv format
+# [6] Test for setting number of randomly sampled rows in csv format
 @pytest.mark.parametrize(
     "input_path, text_field, options, num_rows",
     [
@@ -266,11 +287,11 @@ def test_normalise_csv_to_csv_max_rows(
 
     assert df.shape[0] == num_rows
 
-# tests for custom corrections dictionary
+# [7] tests for custom corrections dictionary
 @pytest.mark.parametrize(
     "input_path, expected_output_path, text_field, out_format, test_correction_dictionary_path, options",
     [
-        # Testing new corrections dictionary 
+        # Output format quickgraph 
         (
             "test_corrections.csv",
             "test_corrections_normalised_qg.json",
@@ -279,7 +300,7 @@ def test_normalise_csv_to_csv_max_rows(
             "dictionary_test_corrections.csv",
             {}
         ),
-        # Testing new corrections dictionary 
+        # Output format csv 
         (
             "test_corrections.csv",
             "test_corrections_normalised_csv.csv",
