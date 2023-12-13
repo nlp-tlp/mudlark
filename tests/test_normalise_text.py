@@ -18,6 +18,7 @@ from mudlark import normalise_text
         ("air / con", "air conditioner"),
         ("air - con", "air conditioner"),
         ("two way", "two way radio"),
+        # ("hold", "hold"), # ! ol -> overload...
         
         # [2] Test cases for converting text to lowercase
         ("UpperCase", "uppercase"),
@@ -61,11 +62,12 @@ from mudlark import normalise_text
         ("hiking crying bouncing licking", "hike cry bounce lick"),
         
         # [10] Test cases for pluralising
-        ("glass", "glass"),  # double s endings
+        ("glass pass class", "glass pass class"),  # double s endings
+        ("glasses passes classes", "glass pass class"),  # sses -> ss
         ("slurries", "slurry"),  # ies -> ry
         ("boxes", "box"),  # xes -> x
         ("pumps busted", "pump bust"), # pumps -> pump
-        # ("the glasses holds foxes", "the glass hold fox") # ! glases -> glass ?
+        ("the foxes buys glasses", "the fox buy glass")
     ],
 )
 def test_normalise_text_default(test_input, expected):

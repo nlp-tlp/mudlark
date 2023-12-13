@@ -101,13 +101,15 @@ def _singularise(word: str):
     Returns:
         str: The singular form of the given word.
     """
-    if len(word) <= 3:  # Don't singularise short words (was, is etc)
+    if len(word) <= 3:  # Don't singularise short words (was, is, etc)
         return word
     if word.endswith("ss"):  # e.g., "glass" -> "glass"
         return word
     if word.endswith("ies") and len(word) > 3:  # e.g., "berries" -> "berry"
         return word[:-3] + "y"
     if word.endswith("xes") and len(word) > 2:  # e.g., "boxes" -> "box"
+        return word[:-2]
+    if word.endswith("ses") and len(word) > 3:  # e.g., "glasses" -> "glass"
         return word[:-2]
     if word.endswith("s") and len(word) > 1:  # e.g., "cats" -> "cat"
         return word[:-1]
@@ -190,12 +192,14 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
     corrected_text = text
     for incorrect, corrected in corrections_dict.items():
         incorrect, corrected = str(incorrect), str(corrected)
-        if incorrect in corrected_text:
+        index = corrected_text.find(incorrect)
+        
+        if index != -1:
             if len(incorrect) < len(corrected):
-                index = corrected_text.find(incorrect)
                 if corrected_text[index:index+len(corrected)] == corrected:
                     continue 
             corrected_text = corrected_text.replace(incorrect, corrected)
+        
     return corrected_text
 
 
