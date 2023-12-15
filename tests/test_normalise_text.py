@@ -67,7 +67,28 @@ from mudlark import normalise_text
         ("slurries", "slurry"),  # ies -> ry
         ("boxes", "box"),  # xes -> x
         ("pumps busted", "pump bust"), # pumps -> pump
-        ("the foxes buys glasses", "the fox buy glass")
+        ("the foxes buys glasses", "the fox buy glass"),
+
+
+        
+        ("wives", "wife"),
+        ("behaves", "behave"),
+        ("retrospectives", "retrospective"),
+
+        ("takes", "take"),
+
+        ("cactus", "cactus"),
+        ("radii", "radius"), 
+        ("alkali", "alkali"), 
+        
+        ("playing throwing tying dyeing eying", "play throw tie dye eye"), 
+        ("using", "use"), 
+        ("creating", "create"),
+        ("bundling","bundle"),
+        ("trolling", "troll"),
+        ("cancelling", "cancel"),
+        ("trembling", "tremble"),
+        ("being", "be"),
     ],
 )
 def test_normalise_text_default(test_input, expected):

@@ -105,13 +105,11 @@ def _singularise(word: str):
         return word
     if word.endswith("ss"):  # e.g., "glass" -> "glass"
         return word
-    if word.endswith("ies") and len(word) > 3:  # e.g., "berries" -> "berry"
+    if word.endswith("ies"):  # e.g., "berries" -> "berry"
         return word[:-3] + "y"
-    if word.endswith("xes") and len(word) > 2:  # e.g., "boxes" -> "box"
+    if word.endswith("es") and ((word[-3] in ["o", "s", "x", "z"]) or (word[-4:-2] in ["sh", "ch"])):  # e.g., "glasses" -> "glass"
         return word[:-2]
-    if word.endswith("ses") and len(word) > 3:  # e.g., "glasses" -> "glass"
-        return word[:-2]
-    if word.endswith("s") and len(word) > 1:  # e.g., "cats" -> "cat"
+    if word.endswith("s") and (word[-2] not in ["u"]):  # e.g., "cats" -> "cat"
         return word[:-1]
     return word
 
@@ -145,6 +143,7 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         "did": "do",
         "went": "go",
         "ran": "run",
+        
     }
     if verb in irregulars:
         return irregulars[verb]
@@ -155,18 +154,49 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         words = str(terms).split()
         keywords_set.update(words)
     keywords = list(keywords_set)
-    
+
     if verb not in keywords:
-        endings = ["ing", "ed"]
-        for ending in endings:
-            if verb.endswith(ending):
-                stem = verb[:-len(ending)]
-                if len(stem) > 1:
-                    if stem.endswith(("c", "k")) and not stem.endswith(("ck", "rk")):
-                        return stem + "e"
-                    if stem.endswith("nn") and ending == "ing":
-                        return stem[:-1]
-                return stem
+        if verb.endswith("ed"):
+            stem = verb[:-len("ed")]
+            if len(stem) > 1:
+                if stem.endswith(("c", "k")) and not stem.endswith(("ck", "rk")):
+                    return stem + "e"
+                else: return verb[:-2]
+
+        elif (verb.endswith("ing")):
+            if re.findall(r"^[b-df-hj-np-tv-z]+[aeiou]lling$",verb): # e.g., "filling" -> "fill"
+                return verb[:-3]
+            if re.findall(r"([b-df-hj-np-tvz])\1ing$",verb): # e.g., "labelling" -> "label"
+                return verb[:-4]
+            if verb[-5:-3] == "ee": # e.g., "seeing" -> "see"
+                return verb[:-3]
+            if re.findall(r"^[b-df-hj-np-tv-z]ying$",verb):# e.g., "tying" -> "tie"
+                return verb[0] + "ie"
+            if re.findall(r"[b-df-hj-np-tv-z][aeiou][b-df-hj-np-tvz]ing$",verb): # e.g., "hoping" -> "hope"
+                return verb[:-3] + "e" 
+            if re.findall(r"^[aeiou][b-df-hj-np-tv-z]ing$",verb): # e.g., "using" -> "use"
+                return verb[:-3] + "e" 
+            if verb.endswith("uing"): # e.g., "subduing" -> "subdue"
+                return verb[:-3] + "e" 
+            if verb.endswith("cing"): # e.g., "bouncing" -> "bounce"
+                return verb[:-3] + "e" 
+            if re.findall(r"[b-df-hj-np-tvz]ling$",verb): # e.g., "trembling" -> "tremble"
+                return verb[:-3] + "e" 
+            ## ging +e  -> the ng (???? HELP) and rg and dg arranging, bridging, emerging, exchanging EXCEPT banging belonging etc
+            return verb[:-3]
+
+
+    # if verb not in keywords:
+    #     endings = ["ing", "ed"]
+    #     for ending in endings:
+    #         if verb.endswith(ending):
+    #             stem = verb[:-len(ending)]
+    #             if len(stem) > 1:
+    #                 if stem.endswith(("c", "k")) and not stem.endswith(("ck", "rk")):
+    #                     return stem + "e"
+    #                 if stem.endswith("nn") and ending == "ing":
+    #                     return stem[:-1]
+    #             return stem
 
     return verb
 
@@ -192,14 +222,8 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
     corrected_text = text
     for incorrect, corrected in corrections_dict.items():
         incorrect, corrected = str(incorrect), str(corrected)
-        index = corrected_text.find(incorrect)
-        
-        if index != -1:
-            if len(incorrect) < len(corrected):
-                if corrected_text[index:index+len(corrected)] == corrected:
-                    continue 
-            corrected_text = corrected_text.replace(incorrect, corrected)
-        
+        replace = r"\b"+incorrect+r"\b"
+        corrected_text = re.sub(replace, corrected, corrected_text)
     return corrected_text
 
 
