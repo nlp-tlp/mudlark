@@ -155,6 +155,7 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         keywords_set.update(words)
     keywords = list(keywords_set)
 
+    
     if verb not in keywords:
         if verb.endswith("ed"):
             stem = verb[:-len("ed")]
@@ -164,25 +165,43 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
                 else: return verb[:-2]
 
         elif (verb.endswith("ing")):
-            if re.findall(r"^[b-df-hj-np-tv-z]+[aeiou]lling$",verb): # e.g., "filling" -> "fill"
+            if re.findall(r"^[b-df-hj-np-tv-xz]+ing$",verb): # one syllable +lling words e.g., "filling" -> "fill"
+                return verb
+            if re.findall(r"^[b-df-hj-np-tv-z]+[aeiou]lling$",verb): # one syllable +lling words e.g., "filling" -> "fill"
                 return verb[:-3]
-            if re.findall(r"([b-df-hj-np-tvz])\1ing$",verb): # e.g., "labelling" -> "label"
+            if re.findall(r"([b-df-hj-np-tvz])\1ing$",verb): # e.g., "jogging" -> "jog"
                 return verb[:-4]
-            if verb[-5:-3] == "ee": # e.g., "seeing" -> "see"
-                return verb[:-3]
             if re.findall(r"^[b-df-hj-np-tv-z]ying$",verb):# e.g., "tying" -> "tie"
                 return verb[0] + "ie"
-            if re.findall(r"[b-df-hj-np-tv-z][aeiou][b-df-hj-np-tvz]ing$",verb): # e.g., "hoping" -> "hope"
+            if re.findall(r"[b-df-hj-np-tv-z][aeiou][b-df-hj-npqstvz]ing$",verb): # e.g., "hoping" -> "hope"
                 return verb[:-3] + "e" 
             if re.findall(r"^[aeiou][b-df-hj-np-tv-z]ing$",verb): # e.g., "using" -> "use"
                 return verb[:-3] + "e" 
-            if verb.endswith("uing"): # e.g., "subduing" -> "subdue"
+            if verb.endswith("uing"): # e.g. "subduing" -> "subdue"
                 return verb[:-3] + "e" 
-            if verb.endswith("cing"): # e.g., "bouncing" -> "bounce"
+            if verb.endswith("cing"): # deals with -cing, e.g. "bouncing" -> "bounce"
                 return verb[:-3] + "e" 
-            if re.findall(r"[b-df-hj-np-tvz]ling$",verb): # e.g., "trembling" -> "tremble"
+            if re.findall(r"[rdl]ging$",verb): # deals with -rging, -dging, -lging, e.g. "arranging" -> "arrange" ** does not deal with -nging 
                 return verb[:-3] + "e" 
-            ## ging +e  -> the ng (???? HELP) and rg and dg arranging, bridging, emerging, exchanging EXCEPT banging belonging etc
+            if re.findall(r"[b-df-hj-np-tvz]ling$",verb): # deals with <consonant sound> + ling, e.g. "trembling" -> "tremble"
+                return verb[:-3] + "e" 
+            
+            # vowel + ring
+            if re.findall(r"[b-df-hj-np-tv-z]+[aiu]+ring$",verb): # deals with <consonant sound> + ling, e.g. "trembling" -> "tremble"
+                return verb[:-3] + "e" 
+            inclusions_ering = ["adhering", "interfering", "premiering", "revering"]
+            if verb in inclusions_ering: # deals with <consonant sound> + ling, e.g. "trembling" -> "tremble"
+                return verb[:-3] + "e" 
+            exceptions_oring = r"(coloring|tailoring|sailoring|authoring|anchoring|vaporing)$"
+            incusions_oring = r"^(snoring|storing|restoring|boring|chokeboring|reboring|counterboring)$"
+            if re.findall(incusions_oring + r"|^[b-df-hj-np-tv-z]+oring$",verb) or ( re.findall(r"[ldhp]oring$",verb) and not re.findall(exceptions_oring,verb) ): # deals with -oring that should add an e, e.g. "requiring" -> "require"
+                return verb[:-3] + "e" 
+            
+            # vowel + vowel + consonant + ing exceptions
+            if re.findall(r"uiring$",verb): # deals with -uiring, e.g. "requiring" -> "require"
+                return verb[:-3] + "e" 
+            
+            
             return verb[:-3]
 
 
