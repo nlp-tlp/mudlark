@@ -40,9 +40,8 @@ Part of the normalisation stage involves replacing any words appearing in a pred
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
+   self
+   installation
+   usage
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
