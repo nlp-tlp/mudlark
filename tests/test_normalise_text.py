@@ -103,6 +103,23 @@ from mudlark import normalise_text
         ("adhering", "adhere"),
         ("hovering", "hover"),
         ("bring", "bring"),
+        ("accessing", "access"),
+        ("choosing", "choose"),
+        ("looking", "look"),
+        ("cheesing", "cheese"),
+        ("analysing", "analyse"),
+        ("absolving", "absolve"),
+        ("spying", "spy"),
+        ("squeezing", "squeeze"),
+        ("throwing", "throw"),
+        ("buzzing", "buzz"),
+        ("smearing", "smear"),
+        ("biasing", "bias"),
+        ("aviating", "aviate"),
+        ("radiating", "radiate"),
+        ("dialing", "dial"),
+        ("aliasing", "alias"),
+
     ],
 )
 def test_normalise_text_default(test_input, expected):
