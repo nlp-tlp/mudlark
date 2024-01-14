@@ -136,6 +136,8 @@ from mudlark import normalise_text
         ("controlling", "control"),
         ("enrolling", "enroll"),
         ("perilling", "peril"),
+        ("recalling", "recall"),
+        ("caballing", "cabal"),
     ],
 )
 def test_normalise_text_default(test_input, expected):

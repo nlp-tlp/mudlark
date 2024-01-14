@@ -184,7 +184,7 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
             multisyllable_ll_verbs = r"^(bankrolling|bespelling|bookselling|bushfelling|doomscrolling|enrolling|farewelling|hairpulling|handselling|inscrolling|kvelling|logrolling|misspelling|outpolling|outpulling|outrolling|outselling|outswelling|outwelling|outyelling|overselling|outsmelling|overswelling|preselling|reenrolling|repolling|rerolling|reselling|respelling|steamrolling|unrolling|underselling|uprolling|upselling|upswelling|upwelling)$"
             if re.findall(multisyllable_ll_verbs, verb):
                 return verb[:-3]
-            if re.findall(r"([bct]alling$)|(thralling$)", verb) and not re.findall(r"^(caballing|gimballing|metalling|pedastalling|totalling)$"):
+            if re.findall(r"([bct]alling$)|(thralling$)", verb) and not re.findall(r"^(caballing|gimballing|metalling|pedastalling|totalling)$", verb):
                 return verb[:-3]
             if verb == "chandelling" or verb == "cordelling":
                 return verb[:-3] + "e" 
