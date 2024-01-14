@@ -165,9 +165,9 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
                 else: return verb[:-2]
 
         elif (verb.endswith("ing")):
-            # nouns 
-            ing_nouns = ["ceiling"]
-            if verb in ing_nouns:
+            # not verbs 
+            ing_not_verbs = ["ceiling", "beesting", "beeswing", "hamstring", "lightning", "shilling", "willing", "unwilling","swing"]
+            if verb in ing_not_verbs:
                 return verb
             if re.findall(r"^[b-df-hj-np-tv-xz]+ing$",verb): # one syllable -ing words, e.g. "bring" -> "bring"
                 return verb
@@ -180,7 +180,20 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
                 return verb[:-3] + "e" 
             
             # dealing with patterns
-            if re.findall(r"([b-df-hj-np-rtv])\1ing$",verb): # e.g., "jogging" -> "jog"
+            double_letter_ending_verbs = r"^(ebbing|adding|superadding|odding|redding|egging|inning|erring|shirring|burring|deburring|flurring|skirring|purring|putting|vaxxing)$"
+            multisyllable_ll_verbs = r"^(bankrolling|bespelling|bookselling|bushfelling|doomscrolling|enrolling|farewelling|hairpulling|handselling|inscrolling|kvelling|logrolling|misspelling|outpolling|outpulling|outrolling|outselling|outswelling|outwelling|outyelling|overselling|outsmelling|overswelling|preselling|reenrolling|repolling|rerolling|reselling|respelling|steamrolling|unrolling|underselling|uprolling|upselling|upswelling|upwelling)$"
+            if re.findall(multisyllable_ll_verbs, verb):
+                return verb[:-3]
+            if re.findall(r"([bct]alling$)|(thralling$)", verb) and not re.findall(r"^(caballing|gimballing|metalling|pedastalling|totalling)$"):
+                return verb[:-3]
+            if verb == "chandelling" or verb == "cordelling":
+                return verb[:-3] + "e" 
+            if verb.endswith("telling"):
+                return verb[:-3]
+            illing_exceptions = r"^(imperilling|perilling|postilling)$"
+            if re.findall(r"[bdf-hj-np-tw-z]illing$",verb) and not re.findall(illing_exceptions, verb):
+                return verb[:-3]
+            if re.findall(r"([b-dghj-np-rtv])\1ing$",verb) and not re.findall(double_letter_ending_verbs, verb): # e.g., "jogging" -> "jog"
                 return verb[:-4]
             if re.findall(r"[b-df-hj-np-tv-z][aeiou][b-df-hj-npqstvz]ing$",verb): # e.g., "hoping" -> "hope"
                 return verb[:-3] + "e" 
@@ -209,11 +222,29 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
             # au_ing
             if verb.endswith("auging"): # deals with "au" exceptions, e.g. "gauging" -> "gauge" 
                 return verb[:-3] + "e" 
+            # ea_ing 
+            ea_inclusions = ["bequeathing", "freathing"]
+            if verb in ea_inclusions:
+                return verb[:-3]
+            if verb.endswith("eathing"): # deals with "ea" exceptions, e.g. "breathing" -> "breathe" 
+                return verb[:-3] + "e"
+            # ee_ing
+            ee_exclusions = ["teething", "seething"]
+            if verb in ee_exclusions:
+                return verb[:-3] + "e"
             # eu_ing 
             if verb.endswith("euning"): # e.g. "reuning" -> "reune"
                 return verb[:-3] + "e"
+            # ie_ing
+            ie_exclusions = ["julienning"]
+            if verb in ie_exclusions:
+                return verb[:-3] + "e"
+            # oo_ing 
+            oo_exceptions = ["soogeing"]
+            if verb in oo_exceptions:
+                return verb[:-3] + "e"
             # ou_ing
-            ou_exceptions = ["routing","misrouting","rerouting"]
+            ou_exceptions = ["routing","misrouting","rerouting","douching","accouching"]
             if verb in ou_exceptions:
                 return verb[:-3] + "e"
             if verb.endswith("ouging"): # e.g. "scrouging" -> "scrouge"
@@ -229,19 +260,34 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
                 return verb[:-3] + "e" 
             if verb == "requiting":
                 return verb[:-3] + "e" 
-            # ouging
-            # check g again
-            # double vowel 
-            # breathing -> breathe 
-            # fix double l's :( 
             
             
             # going down alphabetically and dealing with exceptions 
             # c
             if verb.endswith("cing"): # deals with -cing, e.g. "bouncing" -> "bounce"
                 return verb[:-3] + "e" 
-            # g # CHECK NG
-            if re.findall(r"[rdl]ging$",verb): # deals with -rging, -dging, -lging, e.g. "arranging" -> "arrange" ** does not deal with -nging 
+            # f 
+            ff_exceptions = r"^(coiffing|piaffing)$"
+            if re.findall(ff_exceptions,verb): # deals with -ffing, e.g. "coiffing" -> "coiffe"
+                return verb[:-3] + "e" 
+            # g 
+            if re.findall(r"[rdl]ging$",verb): # deals with -rging, -dging, -lging, e.g. "dodging" -> "dodge"
+                return verb[:-3] + "e" 
+            if verb.endswith("changing"): 
+                return verb[:-3] + "e" 
+            ranging_inclusions = r"^(boomeranging|pranging)$"
+            if verb.endswith("ranging") and not re.findall(ranging_inclusions,verb): 
+                return verb[:-3] + "e" 
+            if verb.endswith("enging"):
+                return verb[:-3] + "e" 
+            inging_inclusions = r"^(pinging|bringing|outringing|outspringing|overstringing|ringing|springing|stringing|understringing|unstringing|upbringing|upspringing|wringing|attinging)$"
+            if re.findall(r"[bcf-hjkmp-rtv]inging$",verb) and not re.findall(inging_inclusions,verb):
+                return verb[:-3] + "e" 
+            unging_inclusions = r"^(dunging|bunging)$"
+            if verb.endswith("unging") and not re.findall(unging_inclusions, verb):
+                return verb[:-3] + "e" 
+            ng_exceptions = r"^(flanging|twinging|sponging)$"
+            if re.findall(ng_exceptions, verb):
                 return verb[:-3] + "e" 
             # l
             if re.findall(r"[b-df-hj-np-tvz]ling$",verb): # deals with <consonant sound> + ling, e.g. "trembling" -> "tremble"
@@ -270,6 +316,9 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
             if verb.endswith("ving"): # e.g. "solving" -> "solve"
                 return verb[:-3] + "e" 
             # z
+            z_exceptions = r"^(whizzing|quizzing)$"
+            if re.findall(z_exceptions,verb): # deals with -uiring, e.g. "requiring" -> "require"
+                return verb[:-4]
             if verb.endswith("zzing"): # e.g. "buzzing" -> "buzz"
                 return verb[:-3]
             if verb.endswith("zing"): # e.g. "buzzing" -> "buzz"
