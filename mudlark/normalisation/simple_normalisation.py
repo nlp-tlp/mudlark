@@ -155,178 +155,205 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         keywords_set.update(words)
     keywords = list(keywords_set)
 
-    
+    stem = ""
     if verb not in keywords:
         if verb.endswith("ed"):
             stem = verb[:-len("ed")]
-            if len(stem) > 1:
-                if stem.endswith(("c", "k")) and not stem.endswith(("ck", "rk")):
-                    return stem + "e"
-                else: return verb[:-2]
+            # if len(stem) > 1:
+            #     if stem.endswith(("c", "k")) and not stem.endswith(("ck", "rk")):
+            #         return stem + "e"
+            #     else: return verb[:-2]
+            if len(stem) <= 1:
+                return verb
 
         elif (verb.endswith("ing")):
+            stem = verb[:-len("ing")]
             # not verbs 
-            ing_not_verbs = ["ceiling", "beesting", "beeswing", "hamstring", "lightning", "shilling", "willing", "unwilling","swing"]
-            if verb in ing_not_verbs:
+            ing_not_verbs = r"^(ceiling|building|beesting|beeswing|hamstring|lightning|shilling|willing|unwilling|upbringing)$"
+            if re.findall(ing_not_verbs, verb):
                 return verb
-            if re.findall(r"^[b-df-hj-np-tv-xz]+ing$",verb): # one syllable -ing words, e.g. "bring" -> "bring"
-                return verb
-            # dealing with one syllable root words
-            if re.findall(r"^[b-df-hj-np-tv-z]+[aeiou]lling$",verb): # one syllable -lling words, e.g. "filling" -> "fill"
-                return verb[:-3]
-            if re.findall(r"^[b-df-hj-np-tv-z]ying$",verb):# two syllable -ying words, e.g. "tying" -> "tie"
-                return verb[0] + "ie"
-            if re.findall(r"^[aeiou][b-df-hj-np-tv-z]ing$",verb): # e.g., "using" -> "use"
-                return verb[:-3] + "e" 
             
-            # dealing with patterns
-            double_letter_ending_verbs = r"^(ebbing|adding|superadding|odding|redding|egging|inning|erring|shirring|burring|deburring|flurring|skirring|purring|putting|vaxxing)$"
-            multisyllable_ll_verbs = r"^(bankrolling|bespelling|bookselling|bushfelling|doomscrolling|enrolling|farewelling|hairpulling|handselling|inscrolling|kvelling|logrolling|misspelling|outpolling|outpulling|outrolling|outselling|outswelling|outwelling|outyelling|overselling|outsmelling|overswelling|preselling|reenrolling|repolling|rerolling|reselling|respelling|steamrolling|unrolling|underselling|uprolling|upselling|upswelling|upwelling)$"
-            if re.findall(multisyllable_ll_verbs, verb):
-                return verb[:-3]
-            if re.findall(r"([bct]alling$)|(thralling$)", verb) and not re.findall(r"^(caballing|gimballing|metalling|pedastalling|totalling)$", verb):
-                return verb[:-3]
-            if verb == "chandelling" or verb == "cordelling":
-                return verb[:-3] + "e" 
-            if verb.endswith("telling"):
-                return verb[:-3]
-            illing_exceptions = r"^(imperilling|perilling|postilling)$"
-            if re.findall(r"[bdf-hj-np-tw-z]illing$",verb) and not re.findall(illing_exceptions, verb):
-                return verb[:-3]
-            if re.findall(r"([b-dghj-np-rtv])\1ing$",verb) and not re.findall(double_letter_ending_verbs, verb): # e.g., "jogging" -> "jog"
-                return verb[:-4]
-            if re.findall(r"[b-df-hj-np-tv-z][aeiou][b-df-hj-npqstvz]ing$",verb): # e.g., "hoping" -> "hope"
-                return verb[:-3] + "e" 
+        else: 
+            return verb
+        
+        if re.findall(r"^[b-df-hj-np-tv-xz]+$",stem): # one syllable -ing words, e.g. "bring" -> "bring"
+            return verb
+        
+        # dealing with one syllable root words
+        if re.findall(r"^[b-df-hj-np-tv-z]+[aeiou]ll$",stem): # one syllable -lling words, e.g. "filling" -> "fill"
+            return stem
+        if re.findall(r"^[b-df-hj-np-tv-z]ying$",verb): # two syllable -ying words, e.g. "tying" -> "tie"
+            return verb[0] + "ie"
+        if re.findall(r"^[b-df-hj-np-tv-z]yed$",verb): # one syllable -yed exceptions, e.g "dyed" -> "dye"
+            return verb[:-1]
+        if re.findall(r"^[b-df-hj-np-tv-z]ied$",verb):
+            return verb[0] + "ie"
+        if re.findall(r"^[aeiou][b-df-hj-np-tv-z]$",stem): # e.g. "using" -> "use"
+            return stem + "e" 
+        
+        # dealing with patterns
+        double_letter_ending_verbs = r"^(ebb|add|superadd|odd|redd|egg|inn|err|shirr|\
+            burr|deburr|flurr|skirr|purr|putt|vaxx)$"
+        multisyllable_ll_verbs = r"^(bankroll|bespell|booksell|bushfell|doomscroll|enroll|\
+            farewell|hairpull|handsell|inscroll|kvell|logroll|misspell|outpoll|outpull|\
+                outroll|outsell|outswell|outwell|outyell|oversell|outsmell|overswell|\
+                    presell|reenroll|repoll|reroll|resell|respell|steamroll|unroll|\
+                        undersell|uproll|upsell|upswell|upwell)$"
+        if re.findall(multisyllable_ll_verbs, stem):
+            return stem
+        if re.findall(r"([bct]all$)|(thrall$)", stem) and not re.findall(r"^(caball|gimball|metall|pedastall|totall)$", stem):
+            return stem
+        if re.findall(r"^(chandell|cordell)$", stem):
+            return stem + "e" 
+        if stem.endswith("tell"):
+            return stem
+        illing_exceptions = r"^(imperill|perill|postill)$"
+        if re.findall(r"[bdf-hj-np-tw-z]ill$", stem) and not re.findall(illing_exceptions, stem):
+            return stem
+        if re.findall(r"([b-dghj-np-rtv])\1$",stem) and not re.findall(double_letter_ending_verbs, stem): # e.g., "jogging" -> "jog"
+            return stem[:-1]
+        if re.findall(r"[b-df-hj-np-tv-z][aeiou][b-df-hj-npqstvz]$",stem): # e.g., "hoping" -> "hope"
+            return stem + "e" 
+        
+        # two vowel syllable division exceptions
+        syllable_division_exceptions = r"^(enucleat|ideat|malleat|nucleat|permeat|illaqueat|laureat|nauseat)$"
+        if re.findall(syllable_division_exceptions, stem):
+            return stem + "e"
+        # ea
+        if stem.endswith("creat"): # e.g. "recreating" -> "recreate"
+            return stem + "e"
+        if stem.endswith("lineat"): # e.g. "lineating" -> "lineate"
+            return stem + "e"
+        if stem.endswith("caseat"): # e.g. "caseating" -> "caseate"
+            return stem + "e"
+        # ia
+        if stem.endswith("alias"): # e.g. "aliasing" -> "alias"
+            return stem
+        if stem.endswith("bias"): # e.g. "biasing" -> "bias"
+            return stem
+        if re.findall(r"ia[b-df-hjkmnp-tv-z]$",stem): # removing special case -ialing
+            return stem + "e"
+        
+        
+        # vowel digraphs
+        # au_ing
+        if stem.endswith("aug"): # deals with "au" exceptions, e.g. "gauging" -> "gauge" 
+            return stem + "e" 
+        # ea_ing 
+        ea_inclusions = r"^(bequeath|freath)$"
+        if re.findall(ea_inclusions, stem):
+            return stem
+        if stem.endswith("eath"): # deals with "ea" exceptions, e.g. "breathing" -> "breathe" 
+            return stem + "e"
+        # ee_ing
+        ee_exclusions = r"^(teeth|seeth)$"
+        if re.findall(ee_exclusions, stem):
+            return stem + "e"
+        ee_ed_form = r"^(agreed|decreed|demareed|disagreed|emceed|farseed|filigreed|freed|fricasseed|\
+            garnisheed|gratineed|guaranteed|kneed|leveed|peed|pureed|shivareed|squeegeed|squeed|teed|treed|trusteed)$"
+        if re.findall(ee_ed_form, verb):
+            return verb[:-1]
+        if verb.endswith("eed"):
+            return verb
+        # eu_ing 
+        if stem.endswith("eun"): # e.g. "reuning" -> "reune"
+            return stem + "e"
+        # ie_ing
+        ie_exclusions = r"^julienn$"
+        if re.findall(ie_exclusions, stem):
+            return stem + "e"
+        # oo_ing 
+        oo_exceptions = r"^sooge$"
+        if re.findall(oo_exceptions, stem):
+            return stem + "e"
+        # ou_ing
+        ou_exceptions = r"^(rout|misrout|rerout|douch|accouch)$"
+        if re.findall(ou_exceptions, stem):
+            return stem + "e"
+        if stem.endswith("oug"): # e.g. "scrouging" -> "scrouge"
+            return stem + "e"
+        # ua_ing
+        if re.findall(r"ua[dgktr]$", stem): # deals with "ua" exceptions, e.g. "arranging" -> "arrange" 
+            return stem + "e" 
+        # ue_ing
+        if stem == "queu":
+            return stem + "e" 
+        # ui_ing
+        if re.findall(r"ui[rdl]$", stem): # deals with "ui" exceptions, e.g. "arranging" -> "arrange" 
+            return stem + "e" 
+        if stem == "requit":
+            return stem + "e" 
+        
+        
+        # going down alphabetically and dealing with exceptions 
+        # c
+        if stem.endswith("c"): # deals with -cing, e.g. "bouncing" -> "bounce"
+            return stem + "e" 
+        # f 
+        ff_exceptions = r"^(coiff|piaff)$"
+        if re.findall(ff_exceptions,stem): # deals with -ffing, e.g. "coiffing" -> "coiffe"
+            return stem + "e" 
+        # g 
+        if re.findall(r"[rdl]g$",stem): # deals with -rging, -dging, -lging, e.g. "dodging" -> "dodge"
+            return stem + "e" 
+        if stem.endswith("chang"): 
+            return stem + "e" 
+        ranging_inclusions = r"^(boomerang|prang)$"
+        if stem.endswith("rang") and not re.findall(ranging_inclusions,stem): 
+            return stem + "e" 
+        if stem.endswith("eng"):
+            return stem + "e" 
+        inging_ing_specific_inclusions = r"^(bringing|outringing|outspringing|understringing|unstringing|upspringing)$"
+        inging_inclusions = r"^(ping|overstring|ring|spring|string|wring)$"
+        if re.findall(r"[bcf-hjkmp-rtv]ing$",stem) and not re.findall(inging_ing_specific_inclusions,verb) and not re.findall(inging_inclusions,stem):
+            return stem + "e" 
+        unging_inclusions = r"^(dung|bung)$"
+        if stem.endswith("ung") and not re.findall(unging_inclusions, stem):
+            return stem + "e" 
+        ng_exceptions = r"^(flang|twing|spong)$"
+        if re.findall(ng_exceptions, stem):
+            return stem + "e" 
+        # i 
+        if verb.endswith("ied"):
+            return stem[:-1]+"y"
+        # l
+        if re.findall(r"[b-df-hj-np-tvz]l$",stem): # deals with <consonant sound> + ling, e.g. "trembling" -> "tremble"
+            return stem + "e" 
+        # r
+        if re.findall(r"[b-df-hj-np-tv-z]+[aiu]r$",stem): # deals with <consonant sound> + ling, e.g. "trembling" -> "tremble"
+            return stem + "e" 
+        ering_exclusions = r"^(adher|interfer|premier|rever)$"
+        if stem in ering_exclusions: # deals with <consonant sound> + ling, e.g. "trembling" -> "tremble"
+            return stem + "e" 
+        oring_incusions = r"(color|tailor|sailor|author|anchor|vapor)$"
+        oring_exceptions = r"^(snor|stor|restor|bor|chokebor|rebor|counterbor)$"
+        if re.findall(oring_exceptions + r"|^[b-df-hj-np-tv-z]+or$",stem) or ( re.findall(r"[ldhp]or$",stem) and not re.findall(oring_incusions,stem) ): # deals with -oring that should add an e, e.g. "storing" -> "store"
+            return stem + "e" 
+        if re.findall(r"uir$",stem): # deals with -uiring, e.g. "requiring" -> "require"
+            return stem + "e" 
+        # s
+        if stem.endswith("ss"): # deals with -ssing, e.g. "accessing" -> "access"
+            return stem
+        if stem.endswith("s"): # deals with -sing, e.g. "housing" -> "house"
+            return stem + "e" 
+        # u
+        if stem.endswith("u"): # e.g. "subduing" -> "subdue"
+            return stem + "e" 
+        # v 
+        if stem.endswith("v"): # e.g. "solving" -> "solve"
+            return stem + "e" 
+        # z
+        z_exceptions = r"^(whizz|quizz)$"
+        if re.findall(z_exceptions,stem): # deals with -uiring, e.g. "requiring" -> "require"
+            return stem[:-1]
+        if stem.endswith("zz"): # e.g. "buzzing" -> "buzz"
+            return stem
+        if stem.endswith("z"): # e.g. "buzzing" -> "buzz"
+            return stem + "e"
             
-            # two vowel syllable division exceptions
-            syllable_division_exceptions = ["enucleating","ideating","malleating","nucleating","permeating","illaqueating","laureating","nauseating"]
-            if verb in syllable_division_exceptions:
-                return verb[:-3] + "e"
-            # ea
-            if verb.endswith("creating"): # e.g. "recreating" -> "recreate"
-                return verb[:-3] + "e"
-            if verb.endswith("lineating"): # e.g. "lineating" -> "lineate"
-                return verb[:-3] + "e"
-            if verb.endswith("caseating"): # e.g. "caseating" -> "caseate"
-                return verb[:-3] + "e"
-            # ia
-            if verb.endswith("aliasing"): # e.g. "aliasing" -> "alias"
-                return verb[:-3]
-            if verb.endswith("biasing"): # e.g. "biasing" -> "bias"
-                return verb[:-3]
-            if re.findall(r"ia[b-df-hjkmnp-tv-z]ing$",verb): # removing special case -ialing
-                return verb[:-3] + "e"
             
             
-            # vowel digraphs
-            # au_ing
-            if verb.endswith("auging"): # deals with "au" exceptions, e.g. "gauging" -> "gauge" 
-                return verb[:-3] + "e" 
-            # ea_ing 
-            ea_inclusions = ["bequeathing", "freathing"]
-            if verb in ea_inclusions:
-                return verb[:-3]
-            if verb.endswith("eathing"): # deals with "ea" exceptions, e.g. "breathing" -> "breathe" 
-                return verb[:-3] + "e"
-            # ee_ing
-            ee_exclusions = ["teething", "seething"]
-            if verb in ee_exclusions:
-                return verb[:-3] + "e"
-            # eu_ing 
-            if verb.endswith("euning"): # e.g. "reuning" -> "reune"
-                return verb[:-3] + "e"
-            # ie_ing
-            ie_exclusions = ["julienning"]
-            if verb in ie_exclusions:
-                return verb[:-3] + "e"
-            # oo_ing 
-            oo_exceptions = ["soogeing"]
-            if verb in oo_exceptions:
-                return verb[:-3] + "e"
-            # ou_ing
-            ou_exceptions = ["routing","misrouting","rerouting","douching","accouching"]
-            if verb in ou_exceptions:
-                return verb[:-3] + "e"
-            if verb.endswith("ouging"): # e.g. "scrouging" -> "scrouge"
-                return verb[:-3] + "e"
-            # ua_ing
-            if re.findall(r"ua[dgktr]ing$",verb): # deals with "ua" exceptions, e.g. "arranging" -> "arrange" 
-                return verb[:-3] + "e" 
-            # ue_ing
-            if verb == "queuing":
-                return verb[:-3] + "e" 
-            # ui_ing
-            if re.findall(r"ui[rdl]ing$",verb): # deals with "ui" exceptions, e.g. "arranging" -> "arrange" 
-                return verb[:-3] + "e" 
-            if verb == "requiting":
-                return verb[:-3] + "e" 
-            
-            
-            # going down alphabetically and dealing with exceptions 
-            # c
-            if verb.endswith("cing"): # deals with -cing, e.g. "bouncing" -> "bounce"
-                return verb[:-3] + "e" 
-            # f 
-            ff_exceptions = r"^(coiffing|piaffing)$"
-            if re.findall(ff_exceptions,verb): # deals with -ffing, e.g. "coiffing" -> "coiffe"
-                return verb[:-3] + "e" 
-            # g 
-            if re.findall(r"[rdl]ging$",verb): # deals with -rging, -dging, -lging, e.g. "dodging" -> "dodge"
-                return verb[:-3] + "e" 
-            if verb.endswith("changing"): 
-                return verb[:-3] + "e" 
-            ranging_inclusions = r"^(boomeranging|pranging)$"
-            if verb.endswith("ranging") and not re.findall(ranging_inclusions,verb): 
-                return verb[:-3] + "e" 
-            if verb.endswith("enging"):
-                return verb[:-3] + "e" 
-            inging_inclusions = r"^(pinging|bringing|outringing|outspringing|overstringing|ringing|springing|stringing|understringing|unstringing|upbringing|upspringing|wringing|attinging)$"
-            if re.findall(r"[bcf-hjkmp-rtv]inging$",verb) and not re.findall(inging_inclusions,verb):
-                return verb[:-3] + "e" 
-            unging_inclusions = r"^(dunging|bunging)$"
-            if verb.endswith("unging") and not re.findall(unging_inclusions, verb):
-                return verb[:-3] + "e" 
-            ng_exceptions = r"^(flanging|twinging|sponging)$"
-            if re.findall(ng_exceptions, verb):
-                return verb[:-3] + "e" 
-            # l
-            if re.findall(r"[b-df-hj-np-tvz]ling$",verb): # deals with <consonant sound> + ling, e.g. "trembling" -> "tremble"
-                return verb[:-3] + "e" 
-            # r
-            if re.findall(r"[b-df-hj-np-tv-z]+[aiu]ring$",verb): # deals with <consonant sound> + ling, e.g. "trembling" -> "tremble"
-                return verb[:-3] + "e" 
-            inclusions_ering = ["adhering", "interfering", "premiering", "revering"]
-            if verb in inclusions_ering: # deals with <consonant sound> + ling, e.g. "trembling" -> "tremble"
-                return verb[:-3] + "e" 
-            exceptions_oring = r"(coloring|tailoring|sailoring|authoring|anchoring|vaporing)$"
-            incusions_oring = r"^(snoring|storing|restoring|boring|chokeboring|reboring|counterboring)$"
-            if re.findall(incusions_oring + r"|^[b-df-hj-np-tv-z]+oring$",verb) or ( re.findall(r"[ldhp]oring$",verb) and not re.findall(exceptions_oring,verb) ): # deals with -oring that should add an e, e.g. "requiring" -> "require"
-                return verb[:-3] + "e" 
-            if re.findall(r"uiring$",verb): # deals with -uiring, e.g. "requiring" -> "require"
-                return verb[:-3] + "e" 
-            # s
-            if verb.endswith("ssing"): # deals with -ssing, e.g. "accessing" -> "access"
-                return verb[:-3]
-            if verb.endswith("sing"): # deals with -sing, e.g. "housing" -> "house"
-                return verb[:-3] + "e" 
-            # u
-            if verb.endswith("uing"): # e.g. "subduing" -> "subdue"
-                return verb[:-3] + "e" 
-            # v 
-            if verb.endswith("ving"): # e.g. "solving" -> "solve"
-                return verb[:-3] + "e" 
-            # z
-            z_exceptions = r"^(whizzing|quizzing)$"
-            if re.findall(z_exceptions,verb): # deals with -uiring, e.g. "requiring" -> "require"
-                return verb[:-4]
-            if verb.endswith("zzing"): # e.g. "buzzing" -> "buzz"
-                return verb[:-3]
-            if verb.endswith("zing"): # e.g. "buzzing" -> "buzz"
-                return verb[:-3] + "e"
-            
-            
-            
-            return verb[:-3]
+        return stem
 
 
     # if verb not in keywords:
