@@ -75,7 +75,7 @@ def _remove_extra_spaces(text):
     return re.sub(r"\s+", " ", text)
 
 
-def _singularise(word: str):
+def _singularise(word: str, corrections_dict: dict) -> str:
     """
     Attempts to convert a plural word to its singular form.
 
@@ -101,16 +101,58 @@ def _singularise(word: str):
     Returns:
         str: The singular form of the given word.
     """
-    if len(word) <= 3:  # Don't singularise short words (was, is, etc)
-        return word
-    if word.endswith("ss"):  # e.g., "glass" -> "glass"
-        return word
-    if word.endswith("ies"):  # e.g., "berries" -> "berry"
-        return word[:-3] + "y"
-    if word.endswith("es") and ((word[-3] in ["o", "s", "x", "z"]) or (word[-4:-2] in ["sh", "ch"])):  # e.g., "glasses" -> "glass"
-        return word[:-2]
-    if word.endswith("s") and (word[-2] not in ["u"]):  # e.g., "cats" -> "cat"
-        return word[:-1]
+    
+    # Handling some irregular verbs
+    irregulars = {
+        "children": "child",
+        "geese": "goose",
+        "men": "man",
+        "women": "woman",
+        "teeth": "tooth",
+        "feet": "foot",
+        "mice": "mouse",
+        "people": "person"
+    }
+    
+    # More irregulars
+    # -ves becomes -f and -fe
+    # -oes becomes -o
+    # -i becomes -us
+    # -es becomes -is
+    # -a become -on
+    # -a become -um
+    # -ces or -xes becomes -ex or -ix
+    
+    # Normal
+    # -s becomes no s
+    # -es becomes no es
+    # -ves becomes -f and -fe
+    # -ies becomes -y
+    # vowel + ys becomes -vowel+y
+    # -zes or -ses becomes -z or -s
+    
+    
+    
+    # Ignore keywords from corrections_dict
+    keywords_set = set()
+    for terms in corrections_dict.values():
+        words = str(terms).split()
+        keywords_set.update(words)
+    keywords = list(keywords_set)
+
+    if word not in keywords:
+    
+        if len(word) <= 3:  # Don't singularise short words (was, is, etc)
+            return word
+        if word.endswith("ss"):  # e.g., "glass" -> "glass"
+            return word
+        if word.endswith("ies"):  # e.g., "berries" -> "berry"
+            return word[:-3] + "y"
+        if word.endswith("es") and ((word[-3] in ["o", "s", "x", "z"]) or (word[-4:-2] in ["sh", "ch"])):  # e.g., "glasses" -> "glass"
+            return word[:-2]
+        if word.endswith("s") and (word[-2] not in ["u"]):  # e.g., "cats" -> "cat"
+            return word[:-1]
+    
     return word
 
 
@@ -377,10 +419,7 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         if stem.endswith("z"): # e.g. "buzzing" -> "buzz"
             return stem + "e"
             
-
         return stem
-
-
     return verb
 
 
