@@ -62,13 +62,25 @@ from mudlark import normalise_text
         ("hiking crying bouncing licking", "hike cry bounce lick"),
         
         # [10] Test cases for pluralising
+        ("buses foxes bushes churches", "bus fox bush church"),  # sses -> ss, es -> s
+        ("berries slurries", "berry slurry"),  # ies -> y
+        ("potatoes", "potato"),  # oes -> o
+        ("indices vertices", "index vertex"),  # ces -> ex 
+        ("matrices appendices", "matrix appendix"),  # ces -> x
+        ("elves dwarves leaves", "elf dwarf leaf"), # lves -> f, eves -> f
+        ("knives wives", "knife wife"), # ives -> fe
+        ("theses analyses", "thesis analysis"),  # es -> is
+        ("data bacteria", "datum bacterium"),  # a -> um
+        ("phenomena criteria", "phenomenon criterion"),  # a -> on
+        ("radii foci fungi nuclei cacti", "radius focus fungus nucleus cactus"),  # i -> us
+        ("rays boys", "ray boy"),  # ys -> y
         ("glass pass class", "glass pass class"),  # double s endings
         ("glasses passes classes", "glass pass class"),  # sses -> ss
-        ("slurries", "slurry"),  # ies -> ry
-        ("boxes", "box"),  # xes -> x
+        ("quizzes gasses", "quiz gas"),  # exceptions where double becomes one
+        
         ("pumps busted", "pump bust"), # pumps -> pump
         ("the foxes buys glasses", "the fox buy glass"),
-
+        ("situations", "situation"),  # general case
     ],
 )
 def test_normalise_text_default(test_input, expected):

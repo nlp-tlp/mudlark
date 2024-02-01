@@ -52,7 +52,7 @@ def simple_normalise(text: str, corrections_path: str = None):
 
     # 10. Pluralise - Function expects TOKENS not a STRING
     tokens = [
-        _singularise(token) for token in tokens
+        _singularise(word=token, corrections_dict=corrections_dict) for token in tokens
     ]  # i.e. ["filter", "-", ...]
 
     # 11. Recreate _text as string based on processed tokens.
@@ -114,24 +114,8 @@ def _singularise(word: str, corrections_dict: dict) -> str:
         "people": "person"
     }
     
-    # More irregulars
-    # -ves becomes -f and -fe
-    # -oes becomes -o
-    # -i becomes -us
-    # -es becomes -is
-    # -a become -on
-    # -a become -um
-    # -ces or -xes becomes -ex or -ix
-    
-    # Normal
-    # -s becomes no s
-    # -es becomes no es
-    # -ves becomes -f and -fe
-    # -ies becomes -y
-    # vowel + ys becomes -vowel+y
-    # -zes or -ses becomes -z or -s
-    
-    
+    if word in irregulars:
+        return irregulars[word]
     
     # Ignore keywords from corrections_dict
     keywords_set = set()
@@ -141,16 +125,79 @@ def _singularise(word: str, corrections_dict: dict) -> str:
     keywords = list(keywords_set)
 
     if word not in keywords:
+        # Don't singularise short words (was, is, etc)
+        if len(word) <= 3:  
+            return word
+        
+        # ! there are exceptions where double becomes one
+        # ! quizzes -> quiz, gasses -> gas, etc
+        if word.endswith("es"):
+
+            # e.g., "buses" -> "bus"
+            # e.g., "foxes" -> "fox"
+            # e.g., "buzzes" -> "buzz"
+            # e.g., "bushes" -> "bush"
+            # e.g., "churches" -> "church"
+            if (word[-3] in ["s", "x", "z"] or word[-4:-2] in ["sh", "ch"]):
+                return word[:-2]
+            
+            # e.g., "berries" -> "berry"
+            elif word.endswith("ies"):
+                return word[:-3] + "y"
+            
+            # e.g., "potatoes" -> "potato"
+            elif word.endswith("oes"): 
+                return word[:-2]
+            
+            # e.g., "indices" -> "index"
+            # e.g., "vertices" -> "vertex"
+            # ! e.g., "matrices" -> "matrix"
+            # ! e.g., "appendices" -> "appendix"
+            elif word.endswith("ces"):
+                return word[:-4] + "ex"
+            
+            elif word.endswith("ves"):
+                # e.g., "knives" -> "knife"
+                # e.g., "wives" -> "wife"
+                if word.endswith("ives"):
+                    return word[:-3] + "fe"
+                # e.g., "elves" -> "elf"  
+                # e.g., "thieves" -> "thief"
+                # e.g., "leaves" -> "leaf" 
+                else:
+                    return word[:-3] + "f"
+                
+            # "theses" -> "thesis"
+            # "analyses" -> "analysis"
+        
+        elif word.endswith("a"):
+            # e.g., "criteria" -> "criterion"
+            # ! e.g., "bacteria" -> "bacterium"
+            if word.endswith("ia"):
+                return word[:-1] + "on"
+                # ! return word[:-1] + "um"
+            # e.g., "phenomena" -> "phenomenon"
+            # ! e.g., "data" -> "datum"
+            elif word[-2] not in "aeiou":
+                return word[:-1] + "on"
+                # ! return word[:-1] + "um"
+
+        # e.g., "radii" -> "radius"
+        elif word.endswith("i"): 
+            return word[:-1] + "us"
+        
+        # e.g., "rays" -> "ray"
+        # e.g., "boys" -> "boy"
+        elif word.endswith("ys") and word[-3] in ["a", "e", "i", "o", "u"]:
+            return word[:-2] + "y"
     
-        if len(word) <= 3:  # Don't singularise short words (was, is, etc)
+        # Handle double ss endings
+        # e.g., "glass" -> "glass"
+        elif word.endswith("ss"):
             return word
-        if word.endswith("ss"):  # e.g., "glass" -> "glass"
-            return word
-        if word.endswith("ies"):  # e.g., "berries" -> "berry"
-            return word[:-3] + "y"
-        if word.endswith("es") and ((word[-3] in ["o", "s", "x", "z"]) or (word[-4:-2] in ["sh", "ch"])):  # e.g., "glasses" -> "glass"
-            return word[:-2]
-        if word.endswith("s") and (word[-2] not in ["u"]):  # e.g., "cats" -> "cat"
+        
+        # Handle general cases ending in s for plural
+        elif word.endswith("s") and (word[-2] not in ["u"]):  # e.g., "cats" -> "cat"
             return word[:-1]
     
     return word
