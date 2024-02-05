@@ -102,7 +102,7 @@ def _singularise(word: str, corrections_dict: dict) -> str:
         str: The singular form of the given word.
     """
     
-    # Handling some irregular verbs
+    # Handling some irregular nouns
     irregulars = {
         "children": "child",
         "geese": "goose",
@@ -111,7 +111,16 @@ def _singularise(word: str, corrections_dict: dict) -> str:
         "teeth": "tooth",
         "feet": "foot",
         "mice": "mouse",
-        "people": "person"
+        "people": "person",
+        "sheep": "sheep",
+        "deer": "deer",
+        "fish": "fish",
+        "moose": "moose",
+        "series": "series",
+        "species": "species",
+        "corps": "corps",
+        "lens": "lens",
+        "quizzes": "quiz",
     }
     
     if word in irregulars:
@@ -129,13 +138,10 @@ def _singularise(word: str, corrections_dict: dict) -> str:
         if len(word) <= 3:  
             return word
         
-        # ! there are exceptions where double becomes one
-        # ! quizzes -> quiz, gasses -> gas, etc
         if word.endswith("es"):
 
             # e.g., "buses" -> "bus"
             # e.g., "foxes" -> "fox"
-            # e.g., "buzzes" -> "buzz"
             # e.g., "bushes" -> "bush"
             # e.g., "churches" -> "church"
             if (word[-3] in ["s", "x", "z"] or word[-4:-2] in ["sh", "ch"]):
@@ -167,8 +173,11 @@ def _singularise(word: str, corrections_dict: dict) -> str:
                 else:
                     return word[:-3] + "f"
                 
-            # "theses" -> "thesis"
-            # "analyses" -> "analysis"
+                # "theses" -> "thesis"
+                # "analyses" -> "analysis"
+                
+            else:
+                return word[:-1]
         
         elif word.endswith("a"):
             # e.g., "criteria" -> "criterion"
