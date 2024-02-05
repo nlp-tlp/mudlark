@@ -284,7 +284,7 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
             stem = verb[:-len("ing")]
             # eliminating non-verbs that end in -ing 
             ing_non_verbs = r"^(bearing|beesting|beeswing|building|cabling|ceiling|cladding|coupling|cowling|\
-                darling|duckling|fitting|fledgling|hamstring|hireling|inkling|lightning|missing|monitoring|morning|\
+                darling|duckling|fastening|fitting|fledgling|hamstring|hireling|inkling|lightning|missing|monitoring|morning|\
                     outing|packing|quisling|underling|upbringing|unwilling|sapling|shilling|sibling|siding|tailing|\
                         warning|willing|wiring)$"
             if re.findall(ing_non_verbs, verb):
