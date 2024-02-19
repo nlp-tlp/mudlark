@@ -61,23 +61,30 @@ This section describes the manual steps involved in the ``to_present_tense`` fun
 3. Obtain the stem form by removing the -ing or -ed endings.
 4. If the original word is one syllable (the stem consists only of consonants), it is passed through.
 5. Dealing with One-Syllable Root Words:
+      
       - One-syllable -ll stems
       - Two-syllable -ying words
       - One-syllable -yed words
       - One-syllable -ied words
       - Stem consists of vowel + consonant
 6. Dealing with Patterns Applying Over Most Letters:
+      
       - Verbs ending in double consonant letters typically drop the last letter.
+         
          - Example: hopping/hopped => hop
          - Exceptions: -ff, -ll, -ss, -zz
       - Verbs ending in consonant + vowel + consonant pattern add an "e" to the stem.
+         
          - Example: hoping/hoped => hope
          - Exceptions: -r, -w, -x, -y
 7. Dealing with Two Vowel Syllable Division Exceptions:
+      
       - Handle cases when vowel sounds remain distinct.
 8. Dealing with Vowel Digraphs Exceptions:
+      
       - Handle cases when vowel sounds blend together.
 9. Alphabetical Handling of Exceptions:
+      
       - Go down exceptions alphabetically from the end of the stem word.
       - Deal with double letters -ff, -ll, -ss, and -zz.
 
@@ -85,4 +92,28 @@ Convert Nouns to Singular Form
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This section describes the manual steps involved in the ``singularise`` function for converting words to singular form.
 
+1. Pass through all words listed in the corrections dictionary.
+2. Short words (3 letters or fewer) are not singularised.
+3. Words ending in "es" are handled based on specific rules:
 
+      - Special case words ending in -ices changes to either -ex or -ix based on specific cases. e.g., indices => index, matrices => matrix
+      - Special case words ending in -ses change to -sis. e.g., analyses => analysis
+      - Words ending in -ses, -xes, -zes, -ches or -shes drop the "es". e.g., boxes => box
+      - Words ending in -ies and having a length greater than 4 change to -y. e.g., families => family
+      - Words ending in -oes drop the "es". e.g., potatoes => potato
+      - Words ending in -ives change to -fe. e.g., knives => knife
+      - Words ending in -ves change to -f. e.g., leaves => leaf
+      - Other words ending in -es drop the "s".
+4. Dealing with plural words ending in -a:
+      
+      - Special case words ending in -a change to -um. e.g., data => datum
+      - Special case words ending in -a change to -on. e.g., criteria => criterion
+5. Dealimg with plural words endding in -i:
+      
+      - Words ending in -i change to -us. e.g., radii => radius
+6. Words ending in -ys and preceded by a vowel change to -y. e.g., boys => boy
+7. Words ending in -ss remain unchanged after dropping "es". e.g., glass => glass
+8. Words ending in -s and not preceded by "u" or "i" drop the "s".
+      
+      - Example: cars => car, dogs => dog, radius => radius, tennis => tennis
+      - Exceptions: nouns that end in -as
