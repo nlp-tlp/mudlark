@@ -62,17 +62,17 @@ from mudlark import normalise_text
         ("hiking crying bouncing licking", "hike cry bounce lick"),
         
         # [10] Test cases for pluralising
-        ("buses foxes bushes churches oranges pictures", "bus fox bush church orange picture"),  # es -> s
+        ("buses foxes bushes churches oranges pictures houses niches", "bus fox bush church orange picture house niche"),  # es -> s
         ("quizzes", "quiz"),
         ("berries slurries", "berry slurry"),  # ies -> y
         ("potatoes", "potato"),  # oes -> o
         ("indices vertices", "index vertex"),  # ces -> ex 
-        # ("matrices appendices", "matrix appendix"),  # ces -> x
+        ("matrices appendices", "matrix appendix"),  # ces -> x
         ("elves dwarves leaves", "elf dwarf leaf"), # lves -> f, eves -> f
         ("knives wives", "knife wife"), # ives -> fe
-        # ("theses analyses", "thesis analysis"),  # es -> is
-        # ("data bacteria", "datum bacterium"),  # a -> um
-        # ("phenomena criteria", "phenomenon criterion"),  # a -> on
+        ("theses analyses", "thesis analysis"),  # es -> is
+        ("data bacteria", "datum bacterium"),  # a -> um
+        ("phenomena criteria", "phenomenon criterion"),  # a -> on
         ("radii foci fungi nuclei cacti", "radius focus fungus nucleus cactus"),  # i -> us
         ("rays boys", "ray boy"),  # ys -> y
         ("glass pass class", "glass pass class"),  # double s endings

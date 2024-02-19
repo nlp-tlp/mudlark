@@ -139,74 +139,73 @@ def _singularise(word: str, corrections_dict: dict) -> str:
             return word
         
         if word.endswith("es"):
-
-            # e.g., "buses" -> "bus"
-            # e.g., "foxes" -> "fox"
-            # e.g., "bushes" -> "bush"
-            # e.g., "churches" -> "church"
-            if (word[-3] in ["s", "x", "z"] or word[-4:-2] in ["sh", "ch"]):
-                return word[:-2]
             
-            # e.g., "berries" -> "berry"
-            elif word.endswith("ies"):
-                return word[:-3] + "y"
-            
-            # e.g., "potatoes" -> "potato"
-            elif word.endswith("oes"): 
-                return word[:-2]
-            
-            # e.g., "indices" -> "index"
-            # e.g., "vertices" -> "vertex"
-            # ! e.g., "matrices" -> "matrix"
-            # ! e.g., "appendices" -> "appendix"
-            elif word.endswith("ces"):
+            ix_exceptions = r"^(matrices|appendices)$"
+            if re.findall(ix_exceptions, word): # "matrices" -> "matrix", "appendices" -> "appendix"
+                return word[:-3] + "x"
+            ex_exceptions = r"^(indices|vertices|vortices)$" 
+            if re.findall(ex_exceptions, word): # "indices" -> "index", "vertices" -> "vertex"
                 return word[:-4] + "ex"
+            is_exceptions = r"^(theses|analyses|axes|crises|diagnoses|oases|parentheses|syntheses|ellipses|hypotheses|emphases)$"
+            if re.findall(is_exceptions, word): # "theses" -> "thesis", "analyses" -> "analysis"
+                return word[:-2] + "is"
+            
+            # "buses" -> "bus", "foxes" -> "fox", "bushes" -> "bush", "churches" -> "church"
+            if (word[-3] in ["s", "x", "z"] or word[-4:-2] in ["sh", "ch"]):
+                se_exceptions = (
+                    r"^(abuses|accuses|advises|analyses|arises|bases|bruises|cases|causes|ceases|chases|cheeses|chooses|clauses|"
+                    r"closes|collapses|comprises|compromises|confuses|corpses|courses|cruises|curses|databases|decreases|defenses|"
+                    r"diagnoses|diseases|doses|endoreses|enterprises|excuses|exercises|expenses|exposes|franchises|fuses|glimpses|"
+                    r"horses|houses|imposes|impulses|increases|leases|licenses|loses|muses|noises|noses|nurses|offenses|opposes|"
+                    r"pauses|phases|phrases|pleases|poses|praises|premises|promises|proposes|pulses|purchases|purposes|purses|"
+                    r"raises|realises|recognises|refuses|releases|responses|reverses|rises|rinses|roses|senses|shocases|specialises|"
+                    r"spouses|suitcases|suprises|universes|uses|vases|verses|warehouses)$"
+                )
+                ze_exceptions = r"^(analyzes|amazes|blazes|freezes|prizes|sizes)$"
+                che_exceptions = r"^(aches|headaches|niches)$"
+                if re.findall(se_exceptions, word) or re.findall(ze_exceptions, word) or re.findall(che_exceptions, word):
+                    return word[:-1]
+                else:
+                    return word[:-2]
+            
+            elif word.endswith("ies"):  # "berries" -> "berry"
+                return word[:-3] + "y"
+
+            elif word.endswith("oes"):  # "potatoes" -> "potato"
+                return word[:-2]
             
             elif word.endswith("ves"):
-                # e.g., "knives" -> "knife"
-                # e.g., "wives" -> "wife"
-                if word.endswith("ives"):
-                    return word[:-3] + "fe"
-                # e.g., "elves" -> "elf"  
-                # e.g., "thieves" -> "thief"
-                # e.g., "leaves" -> "leaf" 
-                else:
+                if word.endswith("ives"):   # "knives" -> "knife", "wives" -> "wife"
+                    return word[:-3] + "fe" 
+                else:                       # "leaves" -> "leaf", "halves" -> "half"
                     return word[:-3] + "f"
-                
-                # "theses" -> "thesis"
-                # "analyses" -> "analysis"
-                
+
             else:
                 return word[:-1]
         
         elif word.endswith("a"):
-            # e.g., "criteria" -> "criterion"
-            # ! e.g., "bacteria" -> "bacterium"
-            if word.endswith("ia"):
+            um_exceptions = r"^(data|bacteria|memoranda|strata|curricula|millennia|spectra|referenda)$"
+            if re.findall(um_exceptions, word): # "data" -> "datum", "bacteria" -> "bacterium"
+                return word[:-1] + "um"
+            on_exceptions = r"^(criteria|phenomena|automata)$"
+            if re.findall(on_exceptions, word): # "criteria" -> "criterion", "phenomena" -> "phenomenon"
                 return word[:-1] + "on"
-                # ! return word[:-1] + "um"
-            # e.g., "phenomena" -> "phenomenon"
-            # ! e.g., "data" -> "datum"
-            elif word[-2] not in "aeiou":
-                return word[:-1] + "on"
-                # ! return word[:-1] + "um"
 
-        # e.g., "radii" -> "radius"
         elif word.endswith("i"): 
-            return word[:-1] + "us"
+            us_exceptions = r"^(radii|foci|fungi|nuclei|cacti|stimuli)$"
+            if re.findall(us_exceptions, word): # "radii" -> "radius"
+                return word[:-1] + "us"
         
-        # e.g., "rays" -> "ray"
-        # e.g., "boys" -> "boy"
+        # "rays" -> "ray", "boys" -> "boy"
         elif word.endswith("ys") and word[-3] in ["a", "e", "i", "o", "u"]:
             return word[:-2] + "y"
     
-        # Handle double ss endings
-        # e.g., "glass" -> "glass"
+        # Handle double ss endings - "glass" -> "glass"
         elif word.endswith("ss"):
             return word
         
         # Handle general cases ending in s for plural
-        elif word.endswith("s") and (word[-2] not in ["u"]):  # e.g., "cats" -> "cat"
+        elif word.endswith("s") and (word[-2] not in ["u"]):  # "cats" -> "cat"
             return word[:-1]
     
     return word
@@ -252,6 +251,7 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         "saw": "see",
         "sped": "speed",
         "threw": "throw",
+        "knew": "know",
     }
 
     prefixes = r"^(re|under|un|over|dis|mis|out)" # "under" listed before "un" else will never catch "under" cases
@@ -283,10 +283,11 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         elif (verb.endswith("ing")):
             stem = verb[:-len("ing")]
             # eliminating non-verbs that end in -ing 
-            ing_non_verbs = r"^(bearing|beesting|beeswing|building|cabling|ceiling|cladding|coupling|cowling|\
-                darling|duckling|fastening|fitting|fledgling|hamstring|hireling|inkling|lightning|missing|monitoring|morning|\
-                    outing|packing|quisling|underling|upbringing|unwilling|sapling|shilling|sibling|siding|tailing|\
-                        warning|willing|wiring)$"
+            ing_non_verbs = (
+                r"^(bearing|beesting|beeswing|building|cabling|ceiling|cladding|coupling|cowling|darling|duckling|fastening|"
+                r"fitting|fledgling|hamstring|hireling|inkling|lightning|missing|monitoring|morning|outing|packing|quisling|"
+                r"underling|upbringing|unwilling|sapling|shilling|sibling|siding|tailing|warning|willing|wiring)$"
+            )
             if re.findall(ing_non_verbs, verb):
                 return verb
             
@@ -312,8 +313,7 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         
         # dealing with patterns
         # verb exceptions that keep the double letter
-        double_letter_ending_verbs = r"^(ebb|add|superadd|odd|redd|egg|inn|err|shirr|\
-            burr|deburr|flurr|skirr|purr|putt|vaxx)$"
+        double_letter_ending_verbs = r"^(ebb|add|superadd|odd|redd|egg|inn|err|shirr|burr|deburr|flurr|skirr|purr|putt|vaxx)$"
         # stems ending in double letters
         if re.findall(r"([b-dghjkmnp-rtv])\1$",stem) and not re.findall(double_letter_ending_verbs, stem): # e.g., "jogging" -> "jog"
             return stem[:-1]
@@ -355,8 +355,11 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         ee_exclusions = r"^(teeth|seeth)$"
         if re.findall(ee_exclusions, stem): # deals with "ea" exceptions, e.g. "teething" -> "teethe" 
             return stem + "e"
-        ee_ed_form = r"^(agreed|decreed|demareed|disagreed|emceed|farseed|filigreed|freed|fricasseed|\
-            garnisheed|gratineed|guaranteed|kneed|leveed|peed|pureed|shivareed|squeegeed|squeed|teed|treed|trusteed)$"
+
+        ee_ed_form = (
+            r"^(agreed|decreed|demareed|disagreed|emceed|farseed|filigreed|freed|fricasseed|garnisheed|"
+            r"gratineed|guaranteed|kneed|leveed|peed|pureed|shivareed|squeegeed|squeed|teed|treed|trusteed)$"
+        )
         if re.findall(ee_ed_form, verb): # deals with -eed exceptions, e.g. "agreed" -> "agree" 
             return verb[:-1]
         if verb.endswith("eed"): # deals with -eed non-verbs
@@ -423,11 +426,17 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         if verb.endswith("ied"): # e.g. "spied" -> "spy"
             return stem[:-1]+"y"
         # l
-        multisyllable_ll_verbs = r"^(bankroll|bespell|booksell|bushfell|doomscroll|\
-            farewell|hairpull|handsell|inscroll|kvell|logroll|misspell|outpoll|outpull|\
-                outroll|outsell|outswell|outwell|outyell|oversell|outsmell|overswell|\
-                    presell|reenroll|repoll|reroll|resell|respell|steamroll|unroll|\
-                        undersell|uproll|upsell|upswell|upwell)$"
+        
+        ee_ed_form = (
+            r"^(agreed|decreed|demareed|disagreed|emceed|farseed|filigreed|freed|fricasseed|garnisheed|"
+            r"gratineed|guaranteed|kneed|leveed|peed|pureed|shivareed|squeegeed|squeed|teed|treed|trusteed)$"
+        )
+        
+        multisyllable_ll_verbs = (
+            r"^(bankroll|bespell|booksell|bushfell|doomscroll|farewell|hairpull|handsell|inscroll|kvell|"
+            r"logroll|misspell|outpoll|outpull|outroll|outsell|outswell|outwell|outyell|oversell|outsmell|overswell|"
+            r"presell|reenroll|repoll|reroll|resell|respell|steamroll|unroll|undersell|uproll|upsell|upswell|upwell)$"
+        )
         if re.findall(multisyllable_ll_verbs, stem):
             return stem
         if re.findall(r"([bct]all$)|(thrall$)", stem) and not re.findall(r"^(caball|gimball|metall|pedastall|totall)$", stem):
