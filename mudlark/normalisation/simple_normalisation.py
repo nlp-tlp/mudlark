@@ -146,7 +146,7 @@ def _singularise(word: str, corrections_dict: dict) -> str:
             ex_exceptions = r"^(indices|vertices|vortices)$" 
             if re.findall(ex_exceptions, word): # "indices" -> "index", "vertices" -> "vertex"
                 return word[:-4] + "ex"
-            is_exceptions = r"^(theses|analyses|axes|crises|diagnoses|oases|parentheses|syntheses|ellipses|hypotheses|emphases)$"
+            is_exceptions = r"^(theses|analyses|crises|diagnoses|oases|parentheses|syntheses|ellipses|hypotheses|emphases)$"
             if re.findall(is_exceptions, word): # "theses" -> "thesis", "analyses" -> "analysis"
                 return word[:-2] + "is"
             
@@ -168,7 +168,7 @@ def _singularise(word: str, corrections_dict: dict) -> str:
                 else:
                     return word[:-2]
             
-            elif word.endswith("ies"):  # "berries" -> "berry"
+            elif word.endswith("ies") and len(word) > 4:  # "berries" -> "berry"
                 return word[:-3] + "y"
 
             elif word.endswith("oes"):  # "potatoes" -> "potato"
@@ -205,7 +205,10 @@ def _singularise(word: str, corrections_dict: dict) -> str:
             return word
         
         # Handle general cases ending in s for plural
-        elif word.endswith("s") and (word[-2] not in ["u"]):  # "cats" -> "cat"
+        elif word.endswith("s") and (word[-2] not in ["i","u"]):  # "cats" -> "cat"
+            as_exceptions = r"^(alias|atlas|bias|canvas|pancreas|whereas)$"
+            if re.findall(as_exceptions, word):
+                return word
             return word[:-1]
     
     return word
