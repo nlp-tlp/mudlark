@@ -273,7 +273,7 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         return irregulars[verb]
 
     if re.findall(prefixes, verb):
-        root = re.sub(prefixes, "", verb) 
+        root = re.sub(prefixes, "", verb)
         if root in irregulars:
             prefix_length = len(verb) - len(root)
             return verb[:prefix_length] + irregulars[root]
@@ -311,7 +311,7 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
 
         # dealing with non-past tense words ====================
         # one syllable words, e.g. "bring" -> "bring"
-        if re.findall(r"^[b-df-hj-np-tv-xz]+$",stem): 
+        if re.findall(r"^[b-df-hj-np-tv-xz]+$",stem):
             return verb
 
         # dealing with one syllable root words =================
@@ -328,11 +328,11 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
             return verb[:-1]
 
         # one syllable -ied words, e.g "died" -> "die"
-        if re.findall(r"^[b-df-hj-np-tv-z]ied$",verb): 
+        if re.findall(r"^[b-df-hj-np-tv-z]ied$",verb):
             return verb[0] + "ie"
 
         # stem consists of vowel + consonant, e.g. "using" -> "use"
-        if re.findall(r"^[aeiou][b-df-hj-np-tv-z]$",stem): 
+        if re.findall(r"^[aeiou][b-df-hj-np-tv-z]$",stem):
             return stem + "e"
 
         # dealing with patterns ===============================
@@ -352,7 +352,6 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
             return stem + "e"
 
         # two vowel syllable division exceptions
-
         # ea exceptions
         syllable_division_exceptions = (
             r"^(enucleat|ideat|malleat|nucleat|permeat|illaqueat|laureat|nauseat)$"
@@ -372,21 +371,22 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         if stem.endswith("bias"): # "biasing" -> "bias"
             return stem
         # "abbreviating" -> "abbreviate". not including special case -ial, "trialing" -> "trial"
-        if re.findall(r"ia[b-df-hjkmnp-tv-z]$",stem): 
+        if re.findall(r"ia[b-df-hjkmnp-tv-z]$",stem):
             return stem + "e"
+
         # vowel digraphs
-        # au exceptions
-        if stem.endswith("aug"): # deals with -aug exceptions, e.g. "gauging" -> "gauge"
+        # aug exceptions
+        if stem.endswith("aug"): # "gauging" -> "gauge"
             return stem + "e"
         # ea exceptions
         ea_inclusions = r"^(bequeath|freath)$"
         if re.findall(ea_inclusions, stem):
             return stem
-        if stem.endswith("eath"): # deals with -eath exceptions, e.g. "breathing" -> "breathe"
+        if stem.endswith("eath"): # "breathing" -> "breathe"
             return stem + "e"
         # ee exceptions
         ee_exclusions = r"^(teeth|seeth)$"
-        if re.findall(ee_exclusions, stem): # "ee" exceptions, e.g. "teething" -> "teethe"
+        if re.findall(ee_exclusions, stem): # "teething" -> "teethe"
             return stem + "e"
 
         ee_ed_form = (
@@ -445,9 +445,13 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
             return stem + "e"
         if stem.endswith("eng"): # "avenging" -> "avenge"
             return stem + "e"
-        inging_ing_specific_inclusions = r"^(bringing|outringing|outspringing|understringing|unstringing|upspringing)$"
+        inging_ing_specific_inclusions = (
+            r"^(bringing|outringing|outspringing|understringing|unstringing|upspringing)$"
+        )
         inging_inclusions = r"^(ping|overstring|ring|spring|string|wring)$"
-        if re.findall(r"[bcf-hjkmp-rtv]ing$",stem) and not re.findall(inging_ing_specific_inclusions,verb) and not re.findall(inging_inclusions,stem):
+        if (re.findall(r"[bcf-hjkmp-rtv]ing$", stem)
+            and not re.findall(inging_ing_specific_inclusions,verb)
+            and not re.findall(inging_inclusions,stem)):
             return stem + "e"
         unging_inclusions = r"^(dung|bung)$"
         if stem.endswith("ung") and not re.findall(unging_inclusions, stem):
@@ -459,18 +463,16 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         if verb.endswith("ied"): # e.g. "spied" -> "spy"
             return stem[:-1]+"y"
         # l
-        ee_ed_form = (
-            r"^(agreed|decreed|demareed|disagreed|emceed|farseed|filigreed|freed|fricasseed|garnisheed|"
-            r"gratineed|guaranteed|kneed|leveed|peed|pureed|shivareed|squeegeed|squeed|teed|treed|trusteed)$"
-        )
         multisyllable_ll_verbs = (
-            r"^(bankroll|bespell|booksell|bushfell|doomscroll|farewell|hairpull|handsell|inscroll|kvell|"
-            r"logroll|misspell|outpoll|outpull|outroll|outsell|outswell|outwell|outyell|oversell|outsmell|overswell|"
-            r"presell|reenroll|repoll|reroll|resell|respell|steamroll|unroll|undersell|uproll|upsell|upswell|upwell)$"
+            r"^(bankroll|bespell|booksell|bushfell|doomscroll|farewell|hairpull|handsell|inscroll|"
+            r"kvell|logroll|misspell|outpoll|outpull|outroll|outsell|outswell|outwell|outyell|"
+            r"oversell|outsmell|overswell|presell|reenroll|repoll|reroll|resell|respell|steamroll|"
+            r"unroll|undersell|uproll|upsell|upswell|upwell)$"
         )
         if re.findall(multisyllable_ll_verbs, stem):
             return stem
-        if re.findall(r"([bct]all$)|(thrall$)", stem) and not re.findall(r"^(caball|gimball|metall|pedastall|totall)$", stem):
+        if (re.findall(r"([bct]all$)|(thrall$)", stem)
+            and not re.findall(r"^(caball|gimball|metall|pedastall|totall)$", stem)):
             return stem
         if re.findall(r"^(chandell|cordell)$", stem):
             return stem + "e"
@@ -481,24 +483,29 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
             return stem
         if stem.endswith("ll"):
             return stem[:-1]
-        if re.findall(r"[b-df-hj-np-tvz]l$",stem): # deals with consonant + l, e.g. "trembling" -> "tremble"
+        # deals with consonant + l, "trembling" -> "tremble"
+        if re.findall(r"[b-df-hj-np-tvz]l$",stem):
             return stem + "e"
         # r
-        if re.findall(r"[b-df-hj-np-tv-z]+[aiu]r$",stem): # deals with consonant + a/i/u vowel + r, e.g. "sparing" -> "spare"
+        # deals with consonant + a/i/u vowel + r, "sparing" -> "spare"
+        if re.findall(r"[b-df-hj-np-tv-z]+[aiu]r$",stem):
             return stem + "e"
         er_exclusions = r"^(adher|interfer|premier|rever)$"
         if stem in er_exclusions:
             return stem + "e"
         or_incusions = r"(color|tailor|sailor|author|anchor|vapor)$"
         or_exceptions = r"^(snor|stor|restor|bor|chokebor|rebor|counterbor)$"
-        if re.findall(or_exceptions + r"|^[b-df-hj-np-tv-z]+or$",stem) or ( re.findall(r"[ldhp]or$",stem) and not re.findall(or_incusions,stem) ): # deals with -oring that should add an e, e.g. "storing" -> "store"
+
+        # deals with -oring that should add an e, "storing" -> "store"
+        if (re.findall(or_exceptions + r"|^[b-df-hj-np-tv-z]+or$",stem)
+            or ( re.findall(r"[ldhp]or$",stem) and not re.findall(or_incusions,stem))):
             return stem + "e"
-        if re.findall(r"uir$",stem): # deals with -uiring, e.g. "requiring" -> "require"
+        if re.findall(r"uir$",stem): # deals with -uiring, "requiring" -> "require"
             return stem + "e"
         # s
-        if stem.endswith("ss"): # deals with -ssing, e.g. "accessing" -> "access"
+        if stem.endswith("ss"): # deals with -ssing, "accessing" -> "access"
             return stem
-        if stem.endswith("s"): # deals with -sing, e.g. "housing" -> "house"
+        if stem.endswith("s"): # deals with -sing, "housing" -> "house"
             return stem + "e"
         # u
         if stem.endswith("u"): # e.g. "subduing" -> "subdue"
