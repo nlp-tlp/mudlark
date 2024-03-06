@@ -32,8 +32,8 @@ aux, auxiliary
 auxilary, auxiliary
 auxillary, auxiliary
 auxilliary, auxiliary
-batt, battery
 batterie, battery
+batt, battery
 beltr, belt
 bent up, bent
 BFWP, boiler feed water pump
@@ -60,28 +60,28 @@ chubb, contractor_6
 clean up, clean
 cleanup, clean
 cm, condition monitoring
-collapesed, collapsed
-collasped, collapsed
+collapesed, collapse
+collasped, collapse
 compresure, compressor
 comprsor, compressor
 condute, conduit
 con mon, condition monitoring
 conmon, condition monitoring
-corrored,corroded
+corrored,corrode
 cpu, central processing unit
-cracking, cracked
-craacking,cracking
-cracks, cracked
-craked,cracked
-creap, creeping
-creaping, creeping
+cracking, crack
+craacking,crack
+cracks, crack
+craked,crack
+creap, creep
+creaping, creep
 c/water, cooling water
 cyclinder, cylinder
 cyl, cylinder
 cylender, cylinder
 d/e, drive end
 demob, demobilise
-deterioated,deteriorated
+deterioated,deteriorate
 def.check, check
 dril, drill
 e stop, emergency stop
@@ -97,11 +97,11 @@ faulted, fault
 faulting, fault
 flr, floor
 fron, front
-fulctuating, fluctuating
+fulctuating, fluctuate
 gbx, gearbox
 g/p, gland packing
 greas, grease
-groundconnections,ground connections
+groundconnections,ground connection
 grd, ground
 grs, contractor_3
 guage, gauge
@@ -136,14 +136,14 @@ leaking, leak
 left hand, left hand side
 lose,lost
 loses,lost
-loosing, losing
+loosing, lose
 lowe, lower
 lv, low voltage
 mag, magnetic
 mag sept, magnetic seperator
 make up,make-up
 maintanance, maintenance
-maintainance, maintenancec
+maintainance, maintenance
 mech seal, mechanical seal
 moter, motor
 n/a, NA
@@ -179,9 +179,9 @@ re - terminate, reterminate
 re design, redesign
 re - locate, relocate
 re-locate, relocate
-reqiuerd, required
+reqiuerd, require
 reapair, repair
-reqiuerd, required
+reqiuerd, require
 repairs, repair
 repl, replace
 repalce, replace
@@ -196,7 +196,7 @@ rtd, temperature sensor
 sce, safety critical element
 servicing, service
 shuitting down, shutting down
-shuting, shutting
+shuting, shut
 svce, service
 sw, software
 switche, switch
@@ -204,8 +204,8 @@ tacho, tachometer
 temp, temperature
 top of, top
 traming, tramming
-tripping on, tripping
-tripping out, tripping
+tripping on, trip
+tripping out, trip
 trrack, track
 turbo/manifold, turbo manifold
 two way, two way radio

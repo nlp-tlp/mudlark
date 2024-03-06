@@ -32,3 +32,19 @@ def expected_output_path(request):
     """
     name = request.param
     return os.path.join(FIXTURE_DIR, "output", f"{name}")
+
+
+
+@pytest.fixture
+def test_correction_dictionary_path(request):
+    """Return the path of the test corrections dictionary e.g. dictionary_test_corrections.csv.
+
+    Args:
+        request (object): The request object.
+
+    Returns:
+        str: The dataset path.
+    """
+    name = request.param
+    return os.path.join(FIXTURE_DIR, "input", f"{name}")
+
