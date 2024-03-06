@@ -147,8 +147,8 @@ def _singularise(word: str, corrections_dict: dict) -> str:
             if re.findall(ex_exceptions, word): # "indices" -> "index", "vertices" -> "vertex"
                 return word[:-4] + "ex"
             is_exceptions = (
-                r"^(theses|analyses|crises|diagnoses|oases|parentheses|syntheses|ellipses|"
-                r"hypotheses|emphases)$"
+                r"^(theses|analyses|crises|diagnoses|oases|parentheses|"
+                r"syntheses|ellipses|hypotheses|emphases)$"
             )
             if re.findall(is_exceptions, word): # "theses" -> "thesis", "analyses" -> "analysis"
                 return word[:-2] + "is"
@@ -200,7 +200,7 @@ def _singularise(word: str, corrections_dict: dict) -> str:
                     r"sieves|slaves|sleeves|solves|starves|staves|stoves|strives|suaves|"
                     r"survives|thrives|troves|twelves|valves|verves|waives|waves|weaves)$"
                 )
-                
+
                 if not re.findall(ves_exceptions, word):
                     if word.endswith("ives"): # "knives" -> "knife", "wives" -> "wife"
                         return word[:-3] + "fe"
@@ -317,11 +317,11 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
             stem = verb[:-len("ing")]
             # eliminating non-verbs that end in -ing
             ing_non_verbs = (
-                r"^(bearing|beesting|beeswing|building|cabling|ceiling|cladding|coupling|cowling|"
-                r"^darling|duckling|fastening|fitting|fledgling|hamstring|hireling|inkling|"
-                r"^lightning|missing|monitoring|morning|outing|packing|quisling|underling|"
-                r"^upbringing|unwilling|sapling|shilling|sibling|"
-                r"^siding|tailing|warning|willing|wiring)$"
+                r"^(bearing|beesting|beeswing|building|cabling|ceiling|cladding|"
+                r"coupling|cowling|darling|duckling|fastening|fitting|fledgling|"
+                r"hamstring|hireling|inkling|lightning|missing|monitoring|morning|"
+                r"outing|packing|quisling|underling|upbringing|unwilling|sapling|"
+                r"shilling|sibling|siding|tailing|warning|willing|wiring)$"
             )
             if re.findall(ing_non_verbs, verb):
                 return verb
@@ -359,7 +359,7 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         # verb exceptions that keep the double letter
         double_letter_ending_verbs = (
             r"^(ebb|add|superadd|odd|redd|egg|inn|err|shirr|"
-            r"^burr|deburr|flurr|skirr|purr|putt|vaxx)$"
+            r"burr|deburr|flurr|skirr|purr|putt|vaxx)$"
         )
 
         # stems ending in double letters
@@ -411,8 +411,8 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
 
         ee_ed_form = (
             r"^(agreed|decreed|demareed|disagreed|emceed|farseed|filigreed|"
-            r"^freed|fricasseed|garnisheed|gratineed|guaranteed|kneed|leveed|"
-            r"^peed|pureed|shivareed|squeegeed|squeed|teed|treed|trusteed)$"
+            r"freed|fricasseed|garnisheed|gratineed|guaranteed|kneed|leveed|"
+            r"peed|pureed|shivareed|squeegeed|squeed|teed|treed|trusteed)$"
         )
         if re.findall(ee_ed_form, verb): # deals with -eed exceptions, "agreed" -> "agree"
             return verb[:-1]
@@ -480,14 +480,14 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         if re.findall(ng_exceptions, stem):
             return stem + "e"
         # i
-        if verb.endswith("ied"): # e.g. "spied" -> "spy"
+        if verb.endswith("ied"): # "spied" -> "spy"
             return stem[:-1]+"y"
         # l
         multisyllable_ll_verbs = (
-            r"^(bankroll|bespell|booksell|bushfell|doomscroll|farewell|hairpull|handsell|inscroll|"
-            r"kvell|logroll|misspell|outpoll|outpull|outroll|outsell|outswell|outwell|outyell|"
-            r"oversell|outsmell|overswell|presell|reenroll|repoll|reroll|resell|respell|steamroll|"
-            r"unroll|undersell|uproll|upsell|upswell|upwell)$"
+            r"^(bankroll|bespell|booksell|bushfell|doomscroll|farewell|hairpull|handsell|"
+            r"inscroll|kvell|logroll|misspell|outpoll|outpull|outroll|outsell|outswell|"
+            r"outwell|outyell|oversell|outsmell|overswell|presell|reenroll|repoll|reroll|"
+            r"resell|respell|steamroll|unroll|undersell|uproll|upsell|upswell|upwell)$"
         )
         if re.findall(multisyllable_ll_verbs, stem):
             return stem
