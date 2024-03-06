@@ -18,7 +18,7 @@ def simple_normalise(text: str, corrections_path: str = None):
     """
 
     corrections_dict = load_corrections_dict(corrections_path)
-    
+
     # 1. Fix typos
     text = _correct_typos(
         text=text, corrections_dict=corrections_dict
@@ -101,7 +101,7 @@ def _singularise(word: str, corrections_dict: dict) -> str:
     Returns:
         str: The singular form of the given word.
     """
-    
+
     # Handling some irregular nouns
     irregulars = {
         "children": "child",
@@ -122,10 +122,10 @@ def _singularise(word: str, corrections_dict: dict) -> str:
         "lens": "lens",
         "quizzes": "quiz",
     }
-    
+
     if word in irregulars:
         return irregulars[word]
-    
+
     # Ignore keywords from corrections_dict
     keywords_set = set()
     for terms in corrections_dict.values():
@@ -135,82 +135,91 @@ def _singularise(word: str, corrections_dict: dict) -> str:
 
     if word not in keywords:
         # Don't singularise short words (was, is, etc)
-        if len(word) <= 3:  
+        if len(word) <= 3:
             return word
-        
+
         if word.endswith("es"):
-            
+
             ix_exceptions = r"^(matrices|appendices)$"
             if re.findall(ix_exceptions, word): # "matrices" -> "matrix", "appendices" -> "appendix"
                 return word[:-3] + "x"
-            ex_exceptions = r"^(indices|vertices|vortices)$" 
+            ex_exceptions = r"^(indices|vertices|vortices)$"
             if re.findall(ex_exceptions, word): # "indices" -> "index", "vertices" -> "vertex"
                 return word[:-4] + "ex"
-            is_exceptions = r"^(theses|analyses|crises|diagnoses|oases|parentheses|syntheses|ellipses|hypotheses|emphases)$"
+            is_exceptions = (
+                r"^(theses|analyses|crises|diagnoses|oases|parentheses|syntheses|ellipses|"
+                r"hypotheses|emphases)$"
+            )
             if re.findall(is_exceptions, word): # "theses" -> "thesis", "analyses" -> "analysis"
                 return word[:-2] + "is"
-            
+
             # "buses" -> "bus", "foxes" -> "fox", "bushes" -> "bush", "churches" -> "church"
             if (word[-3] in ["s", "x", "z"] or word[-4:-2] in ["sh", "ch"]):
                 se_exceptions = (
-                    r"^(abuses|accuses|advises|analyses|arises|bases|bruises|cases|causes|ceases|chases|cheeses|chooses|clauses|"
-                    r"closes|collapses|comprises|compromises|confuses|corpses|courses|cruises|curses|databases|decreases|defenses|"
-                    r"diagnoses|diseases|doses|endoreses|enterprises|excuses|exercises|expenses|exposes|franchises|fuses|glimpses|"
-                    r"horses|houses|imposes|impulses|increases|leases|licenses|loses|muses|noises|noses|nurses|offenses|opposes|"
-                    r"pauses|phases|phrases|pleases|poses|praises|premises|promises|proposes|pulses|purchases|purposes|purses|"
-                    r"raises|realises|recognises|refuses|releases|responses|reverses|rises|rinses|roses|senses|shocases|specialises|"
-                    r"spouses|suitcases|suprises|universes|uses|vases|verses|warehouses)$"
+                    r"^(abuses|accuses|advises|analyses|arises|bases|bruises|cases|causes|ceases|"
+                    r"chases|cheeses|chooses|clauses|closes|collapses|comprises|compromises|"
+                    r"confuses|corpses|courses|cruises|curses|databases|decreases|defenses|"
+                    r"diagnoses|diseases|doses|endoreses|enterprises|excuses|exercises|expenses|"
+                    r"exposes|franchises|fuses|glimpses|horses|houses|imposes|impulses|increases|"
+                    r"leases|licenses|loses|muses|noises|noses|nurses|offenses|opposes|pauses|"
+                    r"phases|phrases|pleases|poses|praises|premises|promises|proposes|pulses|"
+                    r"purchases|purposes|purses|raises|realises|recognises|refuses|releases|"
+                    r"responses|reverses|rises|rinses|roses|senses|shocases|specialises|spouses|"
+                    r"suitcases|suprises|universes|uses|vases|verses|warehouses)$"
                 )
                 ze_exceptions = r"^(analyzes|amazes|blazes|freezes|prizes|sizes)$"
                 che_exceptions = r"^(aches|headaches|niches)$"
-                if re.findall(se_exceptions, word) or re.findall(ze_exceptions, word) or re.findall(che_exceptions, word):
+                if (re.findall(se_exceptions, word) or re.findall(ze_exceptions, word) or
+                    re.findall(che_exceptions, word)):
                     return word[:-1]
                 else:
                     return word[:-2]
-            
+
             elif word.endswith("ies") and len(word) > 4:  # "berries" -> "berry"
                 return word[:-3] + "y"
 
             elif word.endswith("oes"):  # "potatoes" -> "potato"
                 return word[:-2]
-            
+
             elif word.endswith("ves"):
                 if word.endswith("ives"):   # "knives" -> "knife", "wives" -> "wife"
-                    return word[:-3] + "fe" 
+                    return word[:-3] + "fe"
                 else:                       # "leaves" -> "leaf", "halves" -> "half"
                     return word[:-3] + "f"
 
             else:
                 return word[:-1]
-        
+
         elif word.endswith("a"):
-            um_exceptions = r"^(data|bacteria|memoranda|strata|curricula|millennia|spectra|referenda)$"
+            um_exceptions = (
+                r"^(data|bacteria|memoranda|strata|curricula|millennia|spectra|referenda)$"
+            )
             if re.findall(um_exceptions, word): # "data" -> "datum", "bacteria" -> "bacterium"
                 return word[:-1] + "um"
             on_exceptions = r"^(criteria|phenomena|automata)$"
-            if re.findall(on_exceptions, word): # "criteria" -> "criterion", "phenomena" -> "phenomenon"
+            if re.findall(on_exceptions, word): # "criteria" -> "criterion"
                 return word[:-1] + "on"
 
-        elif word.endswith("i"): 
+        elif word.endswith("i"):
             us_exceptions = r"^(radii|foci|fungi|nuclei|cacti|stimuli)$"
             if re.findall(us_exceptions, word): # "radii" -> "radius"
                 return word[:-1] + "us"
-        
+
         # "rays" -> "ray", "boys" -> "boy"
         elif word.endswith("ys") and word[-3] in ["a", "e", "i", "o", "u"]:
             return word[:-2] + "y"
-    
+
         # Handle double ss endings - "glass" -> "glass"
         elif word.endswith("ss"):
             return word
-        
+
         # Handle general cases ending in s for plural
         elif word.endswith("s") and (word[-2] not in ["i","u"]):  # "cats" -> "cat"
             as_exceptions = r"^(alias|atlas|bias|canvas|pancreas|whereas)$"
             if re.findall(as_exceptions, word):
                 return word
             return word[:-1]
-    
+
     return word
 
 
