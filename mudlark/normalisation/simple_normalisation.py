@@ -182,10 +182,30 @@ def _singularise(word: str, corrections_dict: dict) -> str:
                 return word[:-2]
 
             elif word.endswith("ves"):
-                if word.endswith("ives"):   # "knives" -> "knife", "wives" -> "wife"
-                    return word[:-3] + "fe"
-                else:                       # "leaves" -> "leaf", "halves" -> "half"
-                    return word[:-3] + "f"
+                ves_exceptions = (
+                    r"^(abrasives|achieves|addictives|additives|adhesives|adjectives|"
+                    r"administratives|adoptives|alternatives|approves|archives|arrives|"
+                    r"automotives|aves|behaves|believes|captives|carves|caves|cloves|"
+                    r"collectives|comparatives|concaves|conceives|conductives|connectives|"
+                    r"conserves|coves|craves|curves|deceives|delves|deprives|derivatives|"
+                    r"derives|deserves|detectives|digestives|directives|disapproves|dissolves|"
+                    r"dives|doves|drives|electives|eves|evolves|executives|explosives|fives|"
+                    r"forgives|formatives|fugitives|gives|gloves|graves|grieves|grooves|groves|"
+                    r"heaves|hives|hoves|improves|involves|jives|knaves|legislatives|lives|"
+                    r"locomotives|loves|motives|moves|narratives|natives|negatives|nerves|"
+                    r"normatives|objectives|observes|octaves|olives|operatives|overdrives|"
+                    r"oxidatives|paves|perceives|positives|predictives|preserves|primitives|"
+                    r"proves|raves|receives|relieves|relives|relatives|removes|reserves|"
+                    r"resolves|retrieves|revives|revolves|salves|saves|serves|shaves|shoves|"
+                    r"sieves|slaves|sleeves|solves|starves|staves|stoves|strives|suaves|"
+                    r"survives|thrives|troves|twelves|valves|verves|waives|waves|weaves)$"
+                )
+                
+                if not re.findall(ves_exceptions, word):
+                    if word.endswith("ives"): # "knives" -> "knife", "wives" -> "wife"
+                        return word[:-3] + "fe"
+                    else: # "leaves" -> "leaf", "halves" -> "half"
+                        return word[:-3] + "f"
 
             else:
                 return word[:-1]
