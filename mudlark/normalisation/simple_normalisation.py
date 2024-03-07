@@ -22,21 +22,21 @@ def simple_normalise(text: str, corrections_path: str = None):
     # 1. Lowercase text
     text = text.lower()
 
-    # 2. Add space around hypen
-    text = _add_space_around_hyphen(text)
-
-    # 3. Remove commas
+    # 2. Remove commas
     text = _remove_commas(text)
 
-    # 4. Add space around slash
-    text = _space_around_slash(text)
+    # 3. Remove duplicate contiguous characters
+    text = _remove_duplicate_contiguous_chars(text)
+
+    # 4. Add space around punctuation
+    text = _add_space_around_punctuation(text)
 
     # 5. Anonymise sentence
     text = _anonymise_sentence(text)
 
     # 6. Remove extra spaces
     text = _remove_extra_spaces(text)
-    
+
     # 7. Fix typos
     text = _correct_typos(
         text=text, corrections_dict=corrections_dict
@@ -192,7 +192,7 @@ def _singularise(word: str, corrections_dict: dict) -> str:
                     r"directives|disapproves|dissolves|dives|doves|drives|electives|eves|evolves|"
                     r"executives|explosives|fives|forgives|formatives|fugitives|gives|gloves|"
                     r"graves|grieves|grooves|groves|heaves|hives|hoves|improves|involves|"
-                    r"inventives|initiatives|jives|knaves|legislatives||locomotives|loves|"
+                    r"inventives|initiatives|jives|knaves|legislatives|locomotives|loves|"
                     r"motives|moves|narratives|natives|negatives|nerves|normatives|objectives|"
                     r"observes|octaves|olives|operatives|overdrives|oxidatives|paves|perspectives|"
                     r"perceives|positives|predictives|preserves|primitives|progressives|proves|"
@@ -614,24 +614,19 @@ def _anonymise_sentence(sentence):
     # The modified sentence is then returned.
     return anonymised_sentence
 
-
-def _add_space_around_hyphen(text: str):
-    """Add space characters around a hyphen character.
-
+def _add_space_around_punctuation(text: str):
+    """This function will add spaces around punctuation marks.
+    
     Args:
-        text (str): The text to modify.
-
+        text (str): The string to modify.
+        
     Returns:
-        str: The updated text.
+        str: The modified string.
     """
-    # The pattern searches for a non-space character before and after a hyphen.
-    # The replaced text will ensure spaces exist around the hyphen.
-    return re.sub(r"(?<=[^\s])-|-(?=[^\s])", " - ", text)
+    return re.sub(r'([!"#$%&\'()*+,-./:;<=>?@[\\\]^_`{|}~])', r' \1 ', text)
 
-
-def _space_around_slash(text: str):
-    """This function will replace every "/" in the string with " / ",
-    ensuring there's a space before and after each slash.
+def _remove_duplicate_contiguous_chars(text: str):
+    """Remove duplicate contiguous characters from the text.
 
     Args:
         text (str): The string to modify.
@@ -639,8 +634,8 @@ def _space_around_slash(text: str):
     Returns:
         str: The modified string.
     """
-    return text.replace("/", " / ")
-
+    chars_to_remove = r"!\"#$%&'()\*\+,-./:;<=>\?@[\\\]^_`{|}~"
+    return re.sub(rf'([{chars_to_remove}])\1+', r'\1', text)
 
 def _remove_commas(text):
     """Remove commas from the text.

@@ -9,9 +9,9 @@ This section outlines the steps involved in the normalisation process performed 
 **Normalization Steps:**
 
 1. **Lowercase Text:** Convert the entire text to lowercase.
-2. **Add Space Around Hyphen:** Ensure there is a space around hyphens in the text.
-3. **Remove Commas:** Eliminate commas from the text.
-4. **Add Space Around Slash:** Insert spaces around slashes in the text.
+2. **Remove Commas:** Eliminate commas from the text.
+3. **Remove duplicate contiguous characters:** Remove duplicate contiguous characters from the text.
+4. **Add Space Around Punctuations:** Ensures there are spaces around punctuations in the text.
 5. **Anonymise Sentence:** Anonymise the sentence, replacing sensitive information.
 6. **Remove Extra Spaces:** Eliminate any extra spaces between words.
 7. **Fix Typos:** Correct typos using the corrections dictionary.
