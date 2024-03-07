@@ -24,38 +24,41 @@ def simple_normalise(text: str, corrections_path: str = None):
 
     # 2. Remove commas
     text = _remove_commas(text)
+    
+    # 3. Remove undesirable characters
+    text = _remove_undesirable_chars(text)
 
-    # 3. Remove duplicate contiguous characters
+    # 4. Remove duplicate contiguous characters
     text = _remove_duplicate_contiguous_chars(text)
 
-    # 4. Add space around punctuation
+    # 5. Add space around punctuation
     text = _add_space_around_punctuation(text)
 
-    # 5. Anonymise sentence
+    # 6. Anonymise sentence
     text = _anonymise_sentence(text)
 
-    # 6. Remove extra spaces
+    # 7. Remove extra spaces
     text = _remove_extra_spaces(text)
 
-    # 7. Fix typos
+    # 8. Fix typos
     text = _correct_typos(
         text=text, corrections_dict=corrections_dict
     )  # i.e. "filters - filters accumulated due to contamination."
 
-    # 8. Tokenize
+    # 9. Tokenize
     tokens = word_tokenize(text)  # i.e. ["filters", "-", ...]
 
-    # 9. Align tense - Function expects TOKENS not a STRING
+    # 10. Align tense - Function expects TOKENS not a STRING
     tokens = [
         _to_present_tense(verb=token, corrections_dict=corrections_dict) for token in tokens
     ]  # i.e. [... "accumulat", ...]
 
-    # 10. Pluralise - Function expects TOKENS not a STRING
+    # 11. Pluralise - Function expects TOKENS not a STRING
     tokens = [
         _singularise(word=token, corrections_dict=corrections_dict) for token in tokens
     ]  # i.e. ["filter", "-", ...]
 
-    # 11. Recreate _text as string based on processed tokens.
+    # 12. Recreate _text as string based on processed tokens.
     text = " ".join(tokens)
 
     return text
@@ -625,6 +628,18 @@ def _add_space_around_punctuation(text: str):
     """
     return re.sub(r'([!"#$%&\'()*+,-./:;<=>?@[\\\]^_`{|}~])', r' \1 ', text)
 
+def _remove_undesirable_chars(text: str):
+    """Remove undesirable characters from the text.
+
+    Args:
+        text (str): The string to modify.
+
+    Returns:
+        str: The modified string.
+    """
+    chars_to_keep = "\,&\.\#\@\/-"
+    return re.sub(rf"[^a-zA-Z0-9 {chars_to_keep}]", " ", text)
+
 def _remove_duplicate_contiguous_chars(text: str):
     """Remove duplicate contiguous characters from the text.
 
@@ -634,8 +649,9 @@ def _remove_duplicate_contiguous_chars(text: str):
     Returns:
         str: The modified string.
     """
-    chars_to_remove = r"!\"#$%&'()\*\+,-./:;<=>\?@[\\\]^_`{|}~"
-    return re.sub(rf'([{chars_to_remove}])\1+', r'\1', text)
+    chars_to_keep = r"\,&\.\#\@\/-"
+    # chars_to_remove = r"!\"#$%&'()\*\+,-./:;<=>\?@[\\\]^_`{|}~"
+    return re.sub(rf'([{chars_to_keep}])\1+', r'\1', text)
 
 def _remove_commas(text):
     """Remove commas from the text.

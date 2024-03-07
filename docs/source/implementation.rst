@@ -10,15 +10,16 @@ This section outlines the steps involved in the normalisation process performed 
 
 1. **Lowercase Text:** Convert the entire text to lowercase.
 2. **Remove Commas:** Eliminate commas from the text.
-3. **Remove duplicate contiguous characters:** Remove duplicate contiguous characters from the text.
-4. **Add Space Around Punctuations:** Ensures there are spaces around punctuations in the text.
-5. **Anonymise Sentence:** Anonymise the sentence, replacing sensitive information.
-6. **Remove Extra Spaces:** Eliminate any extra spaces between words.
-7. **Fix Typos:** Correct typos using the corrections dictionary.
-8. **Tokenise:** Tokenise the text into a list of words.
-9. **Align Tenses to Present Tense:** Adjust verb tenses to present tense using ``_to_present_tense``.
-10. **Convert Nouns to Singular Form:** Singularise words using ``_singularise``.
-11. **Recreate Text from Tokens:** Reconstruct the normalised text based on processed tokens.
+3. **Remove Undesirable Characters:** Remove undesirable characters from the text.
+4. **Remove Duplicate Contiguous Characters:** Remove duplicate contiguous characters from the text.
+5. **Add Space Around Punctuations:** Ensures there are spaces around punctuations in the text.
+6. **Anonymise Sentence:** Anonymise the sentence, replacing sensitive information.
+7. **Remove Extra Spaces:** Eliminate any extra spaces between words.
+8. **Fix Typos:** Correct typos using the corrections dictionary.
+9. **Tokenise:** Tokenise the text into a list of words.
+10. **Align Tenses to Present Tense:** Adjust verb tenses to present tense using ``_to_present_tense``.
+11. **Convert Nouns to Singular Form:** Singularise words using ``_singularise``.
+12. **Recreate Text from Tokens:** Reconstruct the normalised text based on processed tokens.
 
 For more detailed information on each step, please refer below.
 
