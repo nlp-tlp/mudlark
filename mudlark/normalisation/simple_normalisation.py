@@ -19,28 +19,28 @@ def simple_normalise(text: str, corrections_path: str = None):
 
     corrections_dict = load_corrections_dict(corrections_path)
 
-    # 1. Fix typos
+    # 1. Lowercase text
+    text = text.lower()
+
+    # 2. Add space around hypen
+    text = _add_space_around_hyphen(text)
+
+    # 3. Remove commas
+    text = _remove_commas(text)
+
+    # 4. Add space around slash
+    text = _space_around_slash(text)
+
+    # 5. Anonymise sentence
+    text = _anonymise_sentence(text)
+
+    # 6. Remove extra spaces
+    text = _remove_extra_spaces(text)
+    
+    # 7. Fix typos
     text = _correct_typos(
         text=text, corrections_dict=corrections_dict
     )  # i.e. "filters - filters accumulated due to contamination."
-
-    # 2. Lowercase text
-    text = text.lower()
-
-    # 3. Add space around hypen
-    text = _add_space_around_hyphen(text)
-
-    # 4. Remove commas
-    text = _remove_commas(text)
-
-    # 5. Add space around slash
-    text = _space_around_slash(text)
-
-    # 6. Anonymise sentence
-    text = _anonymise_sentence(text)
-
-    # 7. Remove extra spaces
-    text = _remove_extra_spaces(text)
 
     # 8. Tokenize
     tokens = word_tokenize(text)  # i.e. ["filters", "-", ...]
@@ -181,31 +181,32 @@ def _singularise(word: str, corrections_dict: dict) -> str:
             elif word.endswith("oes"):  # "potatoes" -> "potato"
                 return word[:-2]
 
-            elif word.endswith("ves"):
+            elif word.endswith("ves"):  # "behaves" -> "behave"
                 ves_exceptions = (
                     r"^(abrasives|achieves|addictives|additives|adhesives|adjectives|"
                     r"administratives|adoptives|alternatives|approves|archives|arrives|"
-                    r"automotives|aves|behaves|believes|captives|carves|caves|cloves|"
-                    r"collectives|comparatives|concaves|conceives|conductives|connectives|"
-                    r"conserves|coves|craves|curves|deceives|delves|deprives|derivatives|"
-                    r"derives|deserves|detectives|digestives|directives|disapproves|dissolves|"
-                    r"dives|doves|drives|electives|eves|evolves|executives|explosives|fives|"
-                    r"forgives|formatives|fugitives|gives|gloves|graves|grieves|grooves|groves|"
-                    r"heaves|hives|hoves|improves|involves|jives|knaves|legislatives|lives|"
-                    r"locomotives|loves|motives|moves|narratives|natives|negatives|nerves|"
-                    r"normatives|objectives|observes|octaves|olives|operatives|overdrives|"
-                    r"oxidatives|paves|perceives|positives|predictives|preserves|primitives|"
-                    r"proves|raves|receives|relieves|relives|relatives|removes|reserves|"
-                    r"resolves|retrieves|revives|revolves|salves|saves|serves|shaves|shoves|"
-                    r"sieves|slaves|sleeves|solves|starves|staves|stoves|strives|suaves|"
-                    r"survives|thrives|troves|twelves|valves|verves|waives|waves|weaves)$"
+                    r"automotives|aves|behaves|believes|bravescaptives|carves|captives|caves|"
+                    r"cloves|collectives|comparatives|concaves|conceives|conductives|connectives|"
+                    r"conserves|conservatives|coves|contraceptives|craves|cooperatives|curves|"
+                    r"deceives|delves|deprives|derivatives|derives|deserves|detectives|digestives|"
+                    r"directives|disapproves|dissolves|dives|doves|drives|electives|eves|evolves|"
+                    r"executives|explosives|fives|forgives|formatives|fugitives|gives|gloves|"
+                    r"graves|grieves|grooves|groves|heaves|hives|hoves|improves|involves|"
+                    r"inventives|initiatives|jives|knaves|legislatives||locomotives|loves|"
+                    r"motives|moves|narratives|natives|negatives|nerves|normatives|objectives|"
+                    r"observes|octaves|olives|operatives|overdrives|oxidatives|paves|perspectives|"
+                    r"perceives|positives|predictives|preserves|primitives|progressives|proves|"
+                    r"raves|receives|reeves|relieves|relives|relatives|removes|reserves|"
+                    r"representatives|resolves|retrieves|revives|revolves|salves|saves|serves|"
+                    r"shaves|shoves|sieves|slaves|sleeves|solves|starves|staves|stoves|strives|"
+                    r"suaves|survives|thrives|troves|twelves|valves|verves|waives|waves|weaves)$"
                 )
-
-                if not re.findall(ves_exceptions, word):
-                    if word.endswith("ives"): # "knives" -> "knife", "wives" -> "wife"
-                        return word[:-3] + "fe"
-                    else: # "leaves" -> "leaf", "halves" -> "half"
-                        return word[:-3] + "f"
+                if re.findall(ves_exceptions, word):
+                    return word[:-1]
+                if word.endswith("ives"): # "knives" -> "knife", "wives" -> "wife"
+                    return word[:-3] + "fe"
+                # "leaves" -> "leaf", "halves" -> "half"
+                return word[:-3] + "f"
 
             else:
                 return word[:-1]

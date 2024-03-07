@@ -8,13 +8,13 @@ This section outlines the steps involved in the normalisation process performed 
 
 **Normalization Steps:**
 
-1. **Fix Typos:** Correct typos using the corrections dictionary.
-2. **Lowercase Text:** Convert the entire text to lowercase.
-3. **Add Space Around Hyphen:** Ensure there is a space around hyphens in the text.
-4. **Remove Commas:** Eliminate commas from the text.
-5. **Add Space Around Slash:** Insert spaces around slashes in the text.
-6. **Anonymise Sentence:** Anonymise the sentence, replacing sensitive information.
-7. **Remove Extra Spaces:** Eliminate any extra spaces between words.
+1. **Lowercase Text:** Convert the entire text to lowercase.
+2. **Add Space Around Hyphen:** Ensure there is a space around hyphens in the text.
+3. **Remove Commas:** Eliminate commas from the text.
+4. **Add Space Around Slash:** Insert spaces around slashes in the text.
+5. **Anonymise Sentence:** Anonymise the sentence, replacing sensitive information.
+6. **Remove Extra Spaces:** Eliminate any extra spaces between words.
+7. **Fix Typos:** Correct typos using the corrections dictionary.
 8. **Tokenise:** Tokenise the text into a list of words.
 9. **Align Tenses to Present Tense:** Adjust verb tenses to present tense using ``_to_present_tense``.
 10. **Convert Nouns to Singular Form:** Singularise words using ``_singularise``.
@@ -103,6 +103,7 @@ This section describes the manual steps involved in the ``singularise`` function
       - Words ending in -oes drop the "es". e.g., potatoes => potato
       - Words ending in -ives change to -fe. e.g., knives => knife
       - Words ending in -ves change to -f. e.g., leaves => leaf
+      - Exception words ending in -ves. e.g., "detectives" => "detective"
       - Other words ending in -es drop the "s".
 4. Dealing with plural words ending in -a:
       
