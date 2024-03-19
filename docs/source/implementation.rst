@@ -12,7 +12,7 @@ This section outlines the steps involved in the normalisation process performed 
 2. **Remove Commas:** Eliminate commas from the text.
 3. **Remove Undesirable Characters:** Remove undesirable characters from the text.
 4. **Remove Duplicate Contiguous Characters:** Remove duplicate contiguous characters from the text.
-5. **Add Space Around Punctuations:** Ensures there are spaces around punctuations in the text.
+5. **Add Space Around Punctuations:** Ensures there are spaces around punctuations, while preserving slashes and hyphens in certain cases.
 6. **Anonymise Sentence:** Anonymise the sentence, replacing sensitive information.
 7. **Remove Extra Spaces:** Eliminate any extra spaces between words.
 8. **Fix Typos:** Correct typos using the corrections dictionary.

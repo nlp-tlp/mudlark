@@ -618,15 +618,24 @@ def _anonymise_sentence(sentence):
     return anonymised_sentence
 
 def _add_space_around_punctuation(text: str):
-    """This function will add spaces around punctuation marks.
-    
+    """This function will add spaces around punctuation marks,
+    while preserving slashes and hyphens in certain cases.   
     Args:
         text (str): The string to modify.
         
     Returns:
         str: The modified string.
     """
-    return re.sub(r'([!"#$%&\'()*+,-./:;<=>?@[\\\]^_`{|}~])', r' \1 ', text)
+    # Add spaces around punctuation marks, excluding slashes and hyphens
+    modified_text = re.sub(r'([!"#$%&\'()*+,.:;<=>?@[\\\]^_`{|}~])', r' \1 ', text)
+
+    # Add spaces around slashes (/) where appropriate
+    modified_text = re.sub(r'(\w{3,})\/(\w{3,})', r'\1 / \2', modified_text)
+
+    # Add spaces around hyphens (-) where appropriate
+    modified_text = re.sub(r'(\w{3,})-(\w{3,})', r'\1 - \2', modified_text)
+
+    return modified_text
 
 def _remove_undesirable_chars(text: str):
     """Remove undesirable characters from the text.
