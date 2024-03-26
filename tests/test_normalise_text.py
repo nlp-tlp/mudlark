@@ -32,8 +32,8 @@ from mudlark import normalise_text
         ("c/o replace/repair", "change out replace / repair"),
         ("HELLO/hi hey/HEY hi/hey HI/hi", "hello/hi hey / hey hi/hey hi/hi"),
         ("HELLO-hi hey-HEY hi-hey HI-hi", "hello-hi hey - hey hi-hey hi-hi"), 
-        ("word-hyphen-word", "word - hyphen - word"),   # !! PROBLEM
-        ("word/slash/word", "word / slash / word"),     # !! PROBLEM
+        ("word-hyphen-word", "word - hyphen - word"),
+        ("word/slash/word", "word / slash / word"),
 
         # [6] Test cases for anonymising text
         ("check ABX32ad and DDdkL204ddd", "check AssetID and AssetID"),

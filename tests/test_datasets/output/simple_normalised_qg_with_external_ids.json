@@ -15,12 +15,10 @@
   },
   {
     "tokens": [
-      "x",
-      "/",
-      "x"
+      "x/x"
     ],
-    "original": "x / x",
-    "external_id": "text: x / x"
+    "original": "x/x",
+    "external_id": "text: x/x"
   },
   {
     "tokens": [
@@ -46,10 +44,10 @@
   {
     "tokens": [
       "pump",
-      "busted"
+      "bust"
     ],
-    "original": "pump busted",
-    "external_id": "text: pump busted"
+    "original": "pump bust",
+    "external_id": "text: pump bust"
   },
   {
     "tokens": [
@@ -65,9 +63,9 @@
       "a",
       "leak",
       "is",
-      "formed"
+      "form"
     ],
-    "original": "a leak is formed",
-    "external_id": "text: a leak is formed"
+    "original": "a leak is form",
+    "external_id": "text: a leak is form"
   }
 ]

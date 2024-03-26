@@ -13,11 +13,9 @@
   },
   {
     "tokens": [
-      "a",
-      "/",
-      "c"
+      "a/c"
     ],
-    "original": "a / c"
+    "original": "a/c"
   },
   {
     "tokens": [

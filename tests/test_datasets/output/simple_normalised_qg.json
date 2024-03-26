@@ -13,11 +13,9 @@
   },
   {
     "tokens": [
-      "x",
-      "/",
-      "x"
+      "x/x"
     ],
-    "original": "x / x"
+    "original": "x/x"
   },
   {
     "tokens": [
@@ -40,9 +38,9 @@
   {
     "tokens": [
       "pump",
-      "busted"
+      "bust"
     ],
-    "original": "pump busted"
+    "original": "pump bust"
   },
   {
     "tokens": [
@@ -57,8 +55,8 @@
       "a",
       "leak",
       "is",
-      "formed"
+      "form"
     ],
-    "original": "a leak is formed"
+    "original": "a leak is form"
   }
 ]
