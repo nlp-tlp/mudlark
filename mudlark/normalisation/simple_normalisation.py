@@ -568,8 +568,9 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
     """
 
     corrected_text = text
-    for incorrect, corrected in corrections_dict.items():
-        incorrect, corrected = str(incorrect), str(corrected)
+    sorted_dict = dict(sorted(corrections_dict.items(), key=lambda x: len(str(x[0])), reverse=True))
+    for incorrect, corrected in sorted_dict.items():
+        incorrect, corrected = str(incorrect).lower(), str(corrected)
         replace = r"\b"+incorrect+r"\b"
         corrected_text = re.sub(replace, corrected, corrected_text)
     return corrected_text
@@ -630,10 +631,10 @@ def _add_space_around_punctuation(text: str):
     modified_text = re.sub(r'([!"#$%&\'()*+,.:;<=>?@[\\\]^_`{|}~])', r' \1 ', text)
 
     # Add spaces around slashes (/) where appropriate
-    modified_text = re.sub(r'(\w{3,})\/(\w{3,})', r'\1 / \2', modified_text)
+    modified_text = re.sub(r'(\w{3,})\s*\/\s*(\w{3,})', r'\1 / \2', modified_text)
 
     # Add spaces around hyphens (-) where appropriate
-    modified_text = re.sub(r'(\w{3,})-(\w{3,})', r'\1 - \2', modified_text)
+    modified_text = re.sub(r'(\w{3,})\s*-\s*(\w{3,})', r'\1 - \2', modified_text)
 
     return modified_text
 
@@ -646,7 +647,7 @@ def _remove_undesirable_chars(text: str):
     Returns:
         str: The modified string.
     """
-    chars_to_keep = "\,&\.\#\@\/-"
+    chars_to_keep = r"\,&\.\#\@\/-"
     return re.sub(rf"[^a-zA-Z0-9 {chars_to_keep}]", " ", text)
 
 def _remove_duplicate_contiguous_chars(text: str):

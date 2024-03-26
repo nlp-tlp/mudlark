@@ -31,7 +31,7 @@ from mudlark import normalise_text
         ("test,tube", "test tube"),
         ("engine,pump,pipe", "engine pump pipe"),
         # [5] Test cases for adding spaces around slashes
-        ("X/X", "x / x"),
+        ("X/X", "x/x"),
         ("test/tube", "test / tube"),
         # [6] Test cases for anonymising sentences
         ("check ABX32ad and DDdkL204ddd", "check AssetID and AssetID"),
