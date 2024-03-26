@@ -631,10 +631,10 @@ def _add_space_around_punctuation(text: str):
     modified_text = re.sub(r'([!"#$%&\'()*+,.:;<=>?@[\\\]^_`{|}~])', r' \1 ', text)
 
     # !! Add spaces around slashes (/) where appropriate
-    modified_text = re.sub(r'(\w{3,})\s*\/\s*(\w{3,})', r'\1 / \2', modified_text)
-
+    modified_text = re.sub(r'((\w{3,})\s*\/\s*)(?=\w{3,})', r'\2 / ', modified_text)
+    
     # !! Add spaces around hyphens (-) where appropriate
-    modified_text = re.sub(r'(\w{3,})\s*-\s*(\w{3,})', r'\1 - \2', modified_text)
+    modified_text = re.sub(r'((\w{3,})\s*-\s*)(?=\w{3,})', r'\2 - ', modified_text)
 
     return modified_text
 
