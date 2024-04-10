@@ -4,6 +4,13 @@ import filecmp
 import pandas as pd
 from mudlark import normalise_csv
 
+
+def _files_same(output_path, expected_output_path):
+    return (
+        open(output_path, "r").read() == open(expected_output_path, "r").read()
+    )
+
+
 # [1] tests for quickgraph output format
 @pytest.mark.parametrize(
     "input_path, expected_output_path, text_field, options",
@@ -44,7 +51,6 @@ from mudlark import normalise_csv
             "text",
             {"csv_keep_columns": "hello"},
         ),
-
     ],
     indirect=["input_path", "expected_output_path"],
 )
@@ -69,7 +75,10 @@ def test_normalise_csv_to_quickgraph(
     output_path = tmp_path / "out.json"
     normalise_csv(input_path, text_field, output_path=output_path, **options)
 
-    assert filecmp.cmp(output_path, expected_output_path)
+    assert _files_same(output_path, expected_output_path)
+
+    # assert filecmp.cmp(output_path, expected_output_path)
+
 
 # [2] tests for csv output format
 @pytest.mark.parametrize(
@@ -140,7 +149,8 @@ def test_normalise_csv_to_csv(
         **options
     )
 
-    assert filecmp.cmp(output_path, expected_output_path)
+    assert _files_same(output_path, expected_output_path)
+
 
 # [3] tests for error handling with quickgraph output format
 @pytest.mark.parametrize(
@@ -202,6 +212,7 @@ def test_normalise_csv_to_quickgraph_errors(
         normalise_csv(input_path, text_field, **options)
     assert error_snippet in str(e)
 
+
 # [4] tests for error handling with csv output format
 @pytest.mark.parametrize(
     "input_path, text_field, options, error_type, error_snippet",
@@ -238,6 +249,7 @@ def test_normalise_csv_to_csv_errors(
         print(e)
     assert error_snippet in str(e)
 
+
 # [5] Test for setting number of randomly sampled rows in quickgraph format, and checks
 # normalise_csv also outputs a dataframe as expected when no output_path is specified
 @pytest.mark.parametrize(
@@ -248,8 +260,7 @@ def test_normalise_csv_to_csv_errors(
     ],
     indirect=["input_path"],
 )
-def test_normalise_csv_to_df(
-    input_path, text_field, options, num_rows):
+def test_normalise_csv_to_df(input_path, text_field, options, num_rows):
     """Ensure normalise_csv also outputs a dataframe as expected when no
     output_path is specified.
 
@@ -263,6 +274,7 @@ def test_normalise_csv_to_df(
     df = normalise_csv(input_path, text_field, **options)
     assert df.shape[0] == num_rows
 
+
 # [6] Test for setting number of randomly sampled rows in csv format
 @pytest.mark.parametrize(
     "input_path, text_field, options, num_rows",
@@ -273,7 +285,8 @@ def test_normalise_csv_to_df(
     indirect=["input_path"],
 )
 def test_normalise_csv_to_csv_max_rows(
-    input_path, text_field, options, num_rows, tmp_path):
+    input_path, text_field, options, num_rows, tmp_path
+):
     """Ensure the normalise_text function works as expected.
     At the moment, this always uses simple_normalise().
 
@@ -286,10 +299,17 @@ def test_normalise_csv_to_csv_max_rows(
            temporarily saved).
     """
     output_path = tmp_path / "out.csv"
-    normalise_csv(input_path, text_field, output_path=output_path, output_format="csv", **options)
+    normalise_csv(
+        input_path,
+        text_field,
+        output_path=output_path,
+        output_format="csv",
+        **options
+    )
     df = pd.read_csv(output_path)
 
     assert df.shape[0] == num_rows
+
 
 # [7] tests for custom corrections dictionary
 @pytest.mark.parametrize(
@@ -303,7 +323,7 @@ def test_normalise_csv_to_csv_max_rows(
             "text",
             "quickgraph",
             "dictionary_test_corrections.csv",
-            {}
+            {},
         ),
         # Output format csv
         (
@@ -312,14 +332,23 @@ def test_normalise_csv_to_csv_max_rows(
             "text",
             "csv",
             "dictionary_test_corrections.csv",
-            {}
+            {},
         ),
     ],
-    indirect=["input_path", "expected_output_path", "test_correction_dictionary_path"],
+    indirect=[
+        "input_path",
+        "expected_output_path",
+        "test_correction_dictionary_path",
+    ],
 )
 def test_normalise_custom_corrections(
-    input_path, expected_output_path, text_field, out_format,
-    test_correction_dictionary_path, options, tmp_path
+    input_path,
+    expected_output_path,
+    text_field,
+    out_format,
+    test_correction_dictionary_path,
+    options,
+    tmp_path,
 ):
     """Ensure the normalise_text function works as expected with a custom corrections dictionary.
     At the moment, this always uses simple_normalise().
@@ -340,10 +369,12 @@ def test_normalise_custom_corrections(
     """
     output_path = tmp_path / "out.json"
     normalise_csv(
-        input_path, text_field,
+        input_path,
+        text_field,
         output_path=output_path,
         output_format=out_format,
-        corrections_path=test_correction_dictionary_path, **options
+        corrections_path=test_correction_dictionary_path,
+        **options
     )
 
-    assert filecmp.cmp(output_path, expected_output_path)
+    assert _files_same(output_path, expected_output_path)

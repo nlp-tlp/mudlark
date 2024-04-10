@@ -166,3 +166,5 @@ corrections2.csv
 htmlcov/*
 *.sublime-project
 *.sublime-workspace
+
+test_project.py

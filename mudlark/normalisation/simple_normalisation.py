@@ -24,7 +24,7 @@ def simple_normalise(text: str, corrections_path: str = None):
 
     # 2. Remove commas
     text = _remove_commas(text)
-    
+
     # 3. Remove undesirable characters
     text = _remove_undesirable_chars(text)
 
@@ -50,12 +50,14 @@ def simple_normalise(text: str, corrections_path: str = None):
 
     # 10. Align tense - Function expects TOKENS not a STRING
     tokens = [
-        _to_present_tense(verb=token, corrections_dict=corrections_dict) for token in tokens
+        _to_present_tense(verb=token, corrections_dict=corrections_dict)
+        for token in tokens
     ]  # i.e. [... "accumulat", ...]
 
     # 11. Pluralise - Function expects TOKENS not a STRING
     tokens = [
-        _singularise(word=token, corrections_dict=corrections_dict) for token in tokens
+        _singularise(word=token, corrections_dict=corrections_dict)
+        for token in tokens
     ]  # i.e. ["filter", "-", ...]
 
     # 12. Recreate _text as string based on processed tokens.
@@ -142,22 +144,27 @@ def _singularise(word: str, corrections_dict: dict) -> str:
             return word
 
         if word.endswith("es"):
-
             ix_exceptions = r"^(matrices|appendices)$"
-            if re.findall(ix_exceptions, word): # "matrices" -> "matrix", "appendices" -> "appendix"
+            if re.findall(
+                ix_exceptions, word
+            ):  # "matrices" -> "matrix", "appendices" -> "appendix"
                 return word[:-3] + "x"
             ex_exceptions = r"^(indices|vertices|vortices)$"
-            if re.findall(ex_exceptions, word): # "indices" -> "index", "vertices" -> "vertex"
+            if re.findall(
+                ex_exceptions, word
+            ):  # "indices" -> "index", "vertices" -> "vertex"
                 return word[:-4] + "ex"
             is_exceptions = (
                 r"^(theses|analyses|crises|diagnoses|oases|parentheses|"
                 r"syntheses|ellipses|hypotheses|emphases)$"
             )
-            if re.findall(is_exceptions, word): # "theses" -> "thesis", "analyses" -> "analysis"
+            if re.findall(
+                is_exceptions, word
+            ):  # "theses" -> "thesis", "analyses" -> "analysis"
                 return word[:-2] + "is"
 
             # "buses" -> "bus", "foxes" -> "fox", "bushes" -> "bush", "churches" -> "church"
-            if (word[-3] in ["s", "x", "z"] or word[-4:-2] in ["sh", "ch"]):
+            if word[-3] in ["s", "x", "z"] or word[-4:-2] in ["sh", "ch"]:
                 se_exceptions = (
                     r"^(abuses|accuses|advises|analyses|arises|bases|bruises|cases|causes|ceases|"
                     r"chases|cheeses|chooses|clauses|closes|collapses|comprises|compromises|"
@@ -170,15 +177,22 @@ def _singularise(word: str, corrections_dict: dict) -> str:
                     r"responses|reverses|rises|rinses|roses|senses|shocases|specialises|spouses|"
                     r"suitcases|suprises|universes|uses|vases|verses|warehouses)$"
                 )
-                ze_exceptions = r"^(analyzes|amazes|blazes|freezes|prizes|sizes)$"
+                ze_exceptions = (
+                    r"^(analyzes|amazes|blazes|freezes|prizes|sizes)$"
+                )
                 che_exceptions = r"^(aches|headaches|niches)$"
-                if (re.findall(se_exceptions, word) or re.findall(ze_exceptions, word) or
-                    re.findall(che_exceptions, word)):
+                if (
+                    re.findall(se_exceptions, word)
+                    or re.findall(ze_exceptions, word)
+                    or re.findall(che_exceptions, word)
+                ):
                     return word[:-1]
                 else:
                     return word[:-2]
 
-            elif word.endswith("ies") and len(word) > 4:  # "berries" -> "berry"
+            elif (
+                word.endswith("ies") and len(word) > 4
+            ):  # "berries" -> "berry"
                 return word[:-3] + "y"
 
             elif word.endswith("oes"):  # "potatoes" -> "potato"
@@ -206,7 +220,9 @@ def _singularise(word: str, corrections_dict: dict) -> str:
                 )
                 if re.findall(ves_exceptions, word):
                     return word[:-1]
-                if word.endswith("ives"): # "knives" -> "knife", "wives" -> "wife"
+                if word.endswith(
+                    "ives"
+                ):  # "knives" -> "knife", "wives" -> "wife"
                     return word[:-3] + "fe"
                 # "leaves" -> "leaf", "halves" -> "half"
                 return word[:-3] + "f"
@@ -215,18 +231,18 @@ def _singularise(word: str, corrections_dict: dict) -> str:
                 return word[:-1]
 
         elif word.endswith("a"):
-            um_exceptions = (
-                r"^(data|bacteria|memoranda|strata|curricula|millennia|spectra|referenda)$"
-            )
-            if re.findall(um_exceptions, word): # "data" -> "datum", "bacteria" -> "bacterium"
+            um_exceptions = r"^(data|bacteria|memoranda|strata|curricula|millennia|spectra|referenda)$"
+            if re.findall(
+                um_exceptions, word
+            ):  # "data" -> "datum", "bacteria" -> "bacterium"
                 return word[:-1] + "um"
             on_exceptions = r"^(criteria|phenomena|automata)$"
-            if re.findall(on_exceptions, word): # "criteria" -> "criterion"
+            if re.findall(on_exceptions, word):  # "criteria" -> "criterion"
                 return word[:-1] + "on"
 
         elif word.endswith("i"):
             us_exceptions = r"^(radii|foci|fungi|nuclei|cacti|stimuli)$"
-            if re.findall(us_exceptions, word): # "radii" -> "radius"
+            if re.findall(us_exceptions, word):  # "radii" -> "radius"
                 return word[:-1] + "us"
 
         # "rays" -> "ray", "boys" -> "boy"
@@ -238,7 +254,9 @@ def _singularise(word: str, corrections_dict: dict) -> str:
             return word
 
         # Handle general cases ending in s for plural
-        elif word.endswith("s") and (word[-2] not in ["i","u"]):  # "cats" -> "cat"
+        elif word.endswith("s") and (
+            word[-2] not in ["i", "u"]
+        ):  # "cats" -> "cat"
             as_exceptions = r"^(alias|atlas|bias|canvas|pancreas|whereas)$"
             if re.findall(as_exceptions, word):
                 return word
@@ -312,13 +330,13 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
     stem = ""
     if verb not in keywords:
         if verb.endswith("ed"):
-            stem = verb[:-len("ed")]
+            stem = verb[: -len("ed")]
             # eliminating non-verbs that end in -ed
             if len(stem) <= 1:
                 return verb
 
         elif verb.endswith("ing"):
-            stem = verb[:-len("ing")]
+            stem = verb[: -len("ing")]
             # eliminating non-verbs that end in -ing
             ing_non_verbs = (
                 r"^(bearing|beesting|beeswing|building|cabling|ceiling|cladding|"
@@ -335,28 +353,28 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
 
         # dealing with non-past tense words ====================
         # one syllable words, e.g. "bring" -> "bring"
-        if re.findall(r"^[b-df-hj-np-tv-xz]+$",stem):
+        if re.findall(r"^[b-df-hj-np-tv-xz]+$", stem):
             return verb
 
         # dealing with one syllable root words =================
         # one syllable -ll stem, e.g. "filling" -> "fill"
-        if re.findall(r"^[b-df-hj-np-tv-z]+[aeiou]ll$",stem):
+        if re.findall(r"^[b-df-hj-np-tv-z]+[aeiou]ll$", stem):
             return stem
 
         # two syllable -ying words, e.g. "tying" -> "tie"
-        if re.findall(r"^[b-df-hj-np-tv-z]ying$",verb):
+        if re.findall(r"^[b-df-hj-np-tv-z]ying$", verb):
             return verb[0] + "ie"
 
         # one syllable -yed words, e.g "dyed" -> "dye"
-        if re.findall(r"^[b-df-hj-np-tv-z]yed$",verb):
+        if re.findall(r"^[b-df-hj-np-tv-z]yed$", verb):
             return verb[:-1]
 
         # one syllable -ied words, e.g "died" -> "die"
-        if re.findall(r"^[b-df-hj-np-tv-z]ied$",verb):
+        if re.findall(r"^[b-df-hj-np-tv-z]ied$", verb):
             return verb[0] + "ie"
 
         # stem consists of vowel + consonant, e.g. "using" -> "use"
-        if re.findall(r"^[aeiou][b-df-hj-np-tv-z]$",stem):
+        if re.findall(r"^[aeiou][b-df-hj-np-tv-z]$", stem):
             return stem + "e"
 
         # dealing with patterns ===============================
@@ -367,50 +385,51 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         )
 
         # stems ending in double letters
-        if (re.findall(r"([b-dghjkmnp-rtv])\1$",stem) and not
-            re.findall(double_letter_ending_verbs, stem)): # "jogging" -> "jog"
+        if re.findall(r"([b-dghjkmnp-rtv])\1$", stem) and not re.findall(
+            double_letter_ending_verbs, stem
+        ):  # "jogging" -> "jog"
             return stem[:-1]
 
         # stems ending in consonant + vowel + consonant pattern
-        if re.findall(r"[b-df-hj-np-tv-z][aeiou][b-df-hj-npqstvz]$",stem): # "hoping" -> "hope"
+        if re.findall(
+            r"[b-df-hj-np-tv-z][aeiou][b-df-hj-npqstvz]$", stem
+        ):  # "hoping" -> "hope"
             return stem + "e"
 
         # two vowel syllable division exceptions
         # ea exceptions
-        syllable_division_exceptions = (
-            r"^(enucleat|ideat|malleat|nucleat|permeat|illaqueat|laureat|nauseat)$"
-        )
+        syllable_division_exceptions = r"^(enucleat|ideat|malleat|nucleat|permeat|illaqueat|laureat|nauseat)$"
         if re.findall(syllable_division_exceptions, stem):
             return stem + "e"
-        if stem.endswith("creat"): # "recreating" -> "recreate"
+        if stem.endswith("creat"):  # "recreating" -> "recreate"
             return stem + "e"
-        if stem.endswith("lineat"): # "lineating" -> "lineate"
+        if stem.endswith("lineat"):  # "lineating" -> "lineate"
             return stem + "e"
-        if stem.endswith("caseat"): # "caseating" -> "caseate"
+        if stem.endswith("caseat"):  # "caseating" -> "caseate"
             return stem + "e"
 
         # ia exceptions
-        if stem.endswith("alias"): # "aliasing" -> "alias"
+        if stem.endswith("alias"):  # "aliasing" -> "alias"
             return stem
-        if stem.endswith("bias"): # "biasing" -> "bias"
+        if stem.endswith("bias"):  # "biasing" -> "bias"
             return stem
         # "abbreviating" -> "abbreviate". not including special case -ial, "trialing" -> "trial"
-        if re.findall(r"ia[b-df-hjkmnp-tv-z]$",stem):
+        if re.findall(r"ia[b-df-hjkmnp-tv-z]$", stem):
             return stem + "e"
 
         # vowel digraphs
         # aug exceptions
-        if stem.endswith("aug"): # "gauging" -> "gauge"
+        if stem.endswith("aug"):  # "gauging" -> "gauge"
             return stem + "e"
         # ea exceptions
         ea_inclusions = r"^(bequeath|freath)$"
         if re.findall(ea_inclusions, stem):
             return stem
-        if stem.endswith("eath"): # "breathing" -> "breathe"
+        if stem.endswith("eath"):  # "breathing" -> "breathe"
             return stem + "e"
         # ee exceptions
         ee_exclusions = r"^(teeth|seeth)$"
-        if re.findall(ee_exclusions, stem): # "teething" -> "teethe"
+        if re.findall(ee_exclusions, stem):  # "teething" -> "teethe"
             return stem + "e"
 
         ee_ed_form = (
@@ -418,64 +437,72 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
             r"freed|fricasseed|garnisheed|gratineed|guaranteed|kneed|leveed|"
             r"peed|pureed|shivareed|squeegeed|squeed|teed|treed|trusteed)$"
         )
-        if re.findall(ee_ed_form, verb): # deals with -eed exceptions, "agreed" -> "agree"
+        if re.findall(
+            ee_ed_form, verb
+        ):  # deals with -eed exceptions, "agreed" -> "agree"
             return verb[:-1]
-        if verb.endswith("eed"): # deals with -eed non-verbs
+        if verb.endswith("eed"):  # deals with -eed non-verbs
             return verb
         # eu exceptions
-        if stem.endswith("eun"): # "reuning" -> "reune"
+        if stem.endswith("eun"):  # "reuning" -> "reune"
             return stem + "e"
         # ie exceptions
         ie_exclusions = r"^julienn$"
-        if re.findall(ie_exclusions, stem): # "julienning" -> "julienne"
+        if re.findall(ie_exclusions, stem):  # "julienning" -> "julienne"
             return stem + "e"
         # oo exceptions
         oo_exceptions = r"^sooge$"
-        if re.findall(oo_exceptions, stem): # "soogeing" -> "soogee"
+        if re.findall(oo_exceptions, stem):  # "soogeing" -> "soogee"
             return stem + "e"
         # ou exceptions
         ou_exceptions = r"^(rout|misrout|rerout|douch|accouch)$"
-        if re.findall(ou_exceptions, stem): # "routing" -> "route"
+        if re.findall(ou_exceptions, stem):  # "routing" -> "route"
             return stem + "e"
-        if stem.endswith("oug"): # "scrouging" -> "scrouge"
+        if stem.endswith("oug"):  # "scrouging" -> "scrouge"
             return stem + "e"
         # ua exceptions
-        if re.findall(r"ua[dgktr]$", stem): # "arranging" -> "arrange"
+        if re.findall(r"ua[dgktr]$", stem):  # "arranging" -> "arrange"
             return stem + "e"
         # ue exceptions
-        if stem == "queu": # "queuing" -> "queue"
+        if stem == "queu":  # "queuing" -> "queue"
             return stem + "e"
         # ui exceptions
-        if re.findall(r"ui[rdl]$", stem): # "arranging" -> "arrange"
+        if re.findall(r"ui[rdl]$", stem):  # "arranging" -> "arrange"
             return stem + "e"
-        if stem == "requit": # "requiting" -> "requite"
+        if stem == "requit":  # "requiting" -> "requite"
             return stem + "e"
 
         # going down alphabetically and dealing with exceptions
         # c
-        if stem.endswith("c"): # deals with -c, "bouncing" -> "bounce"
+        if stem.endswith("c"):  # deals with -c, "bouncing" -> "bounce"
             return stem + "e"
         # f
         ff_exceptions = r"^(coiff|piaff)$"
-        if re.findall(ff_exceptions,stem): # deals with -ff, "coiffing" -> "coiffe"
+        if re.findall(
+            ff_exceptions, stem
+        ):  # deals with -ff, "coiffing" -> "coiffe"
             return stem + "e"
         # g
-        if re.findall(r"[rdl]g$",stem): # deals with -rg, -dg, -lg, "dodging" -> "dodge"
+        if re.findall(
+            r"[rdl]g$", stem
+        ):  # deals with -rg, -dg, -lg, "dodging" -> "dodge"
             return stem + "e"
-        if stem.endswith("chang"): # "changing" -> "change"
+        if stem.endswith("chang"):  # "changing" -> "change"
             return stem + "e"
         ranging_inclusions = r"^(boomerang|prang)$"
-        if stem.endswith("rang") and not re.findall(ranging_inclusions,stem): # "ranging" -> "range"
+        if stem.endswith("rang") and not re.findall(
+            ranging_inclusions, stem
+        ):  # "ranging" -> "range"
             return stem + "e"
-        if stem.endswith("eng"): # "avenging" -> "avenge"
+        if stem.endswith("eng"):  # "avenging" -> "avenge"
             return stem + "e"
-        inging_ing_specific_inclusions = (
-            r"^(bringing|outringing|outspringing|understringing|unstringing|upspringing)$"
-        )
+        inging_ing_specific_inclusions = r"^(bringing|outringing|outspringing|understringing|unstringing|upspringing)$"
         inging_inclusions = r"^(ping|overstring|ring|spring|string|wring)$"
-        if (re.findall(r"[bcf-hjkmp-rtv]ing$", stem)
-            and not re.findall(inging_ing_specific_inclusions,verb)
-            and not re.findall(inging_inclusions,stem)):
+        if (
+            re.findall(r"[bcf-hjkmp-rtv]ing$", stem)
+            and not re.findall(inging_ing_specific_inclusions, verb)
+            and not re.findall(inging_inclusions, stem)
+        ):
             return stem + "e"
         unging_inclusions = r"^(dung|bung)$"
         if stem.endswith("ung") and not re.findall(unging_inclusions, stem):
@@ -484,8 +511,8 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         if re.findall(ng_exceptions, stem):
             return stem + "e"
         # i
-        if verb.endswith("ied"): # "spied" -> "spy"
-            return stem[:-1]+"y"
+        if verb.endswith("ied"):  # "spied" -> "spy"
+            return stem[:-1] + "y"
         # l
         multisyllable_ll_verbs = (
             r"^(bankroll|bespell|booksell|bushfell|doomscroll|farewell|hairpull|handsell|"
@@ -495,24 +522,27 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         )
         if re.findall(multisyllable_ll_verbs, stem):
             return stem
-        if (re.findall(r"([bct]all$)|(thrall$)", stem)
-            and not re.findall(r"^(caball|gimball|metall|pedastall|totall)$", stem)):
+        if re.findall(r"([bct]all$)|(thrall$)", stem) and not re.findall(
+            r"^(caball|gimball|metall|pedastall|totall)$", stem
+        ):
             return stem
         if re.findall(r"^(chandell|cordell)$", stem):
             return stem + "e"
         if stem.endswith("tell"):
             return stem
         ill_exceptions = r"^(imperill|perill|postill)$"
-        if re.findall(r"[bdf-hj-np-tw-z]ill$", stem) and not re.findall(ill_exceptions, stem):
+        if re.findall(r"[bdf-hj-np-tw-z]ill$", stem) and not re.findall(
+            ill_exceptions, stem
+        ):
             return stem
         if stem.endswith("ll"):
             return stem[:-1]
         # deals with consonant + l, "trembling" -> "tremble"
-        if re.findall(r"[b-df-hj-np-tvz]l$",stem):
+        if re.findall(r"[b-df-hj-np-tvz]l$", stem):
             return stem + "e"
         # r
         # deals with consonant + a/i/u vowel + r, "sparing" -> "spare"
-        if re.findall(r"[b-df-hj-np-tv-z]+[aiu]r$",stem):
+        if re.findall(r"[b-df-hj-np-tv-z]+[aiu]r$", stem):
             return stem + "e"
         er_exclusions = r"^(adher|interfer|premier|rever)$"
         if stem in er_exclusions:
@@ -521,29 +551,35 @@ def _to_present_tense(verb: str, corrections_dict: dict) -> str:
         or_exceptions = r"^(snor|stor|restor|bor|chokebor|rebor|counterbor)$"
 
         # deals with -oring that should add an e, "storing" -> "store"
-        if (re.findall(or_exceptions + r"|^[b-df-hj-np-tv-z]+or$",stem)
-            or ( re.findall(r"[ldhp]or$",stem) and not re.findall(or_incusions,stem))):
+        if re.findall(or_exceptions + r"|^[b-df-hj-np-tv-z]+or$", stem) or (
+            re.findall(r"[ldhp]or$", stem)
+            and not re.findall(or_incusions, stem)
+        ):
             return stem + "e"
-        if re.findall(r"uir$",stem): # deals with -uiring, "requiring" -> "require"
+        if re.findall(
+            r"uir$", stem
+        ):  # deals with -uiring, "requiring" -> "require"
             return stem + "e"
         # s
-        if stem.endswith("ss"): # deals with -ssing, "accessing" -> "access"
+        if stem.endswith("ss"):  # deals with -ssing, "accessing" -> "access"
             return stem
-        if stem.endswith("s"): # deals with -sing, "housing" -> "house"
+        if stem.endswith("s"):  # deals with -sing, "housing" -> "house"
             return stem + "e"
         # u
-        if stem.endswith("u"): # e.g. "subduing" -> "subdue"
+        if stem.endswith("u"):  # e.g. "subduing" -> "subdue"
             return stem + "e"
         # v
-        if stem.endswith("v"): # e.g. "solving" -> "solve"
+        if stem.endswith("v"):  # e.g. "solving" -> "solve"
             return stem + "e"
         # z
         z_exceptions = r"^(whizz|quizz)$"
-        if re.findall(z_exceptions,stem): # deals with -uiring, e.g. "requiring" -> "require"
+        if re.findall(
+            z_exceptions, stem
+        ):  # deals with -uiring, e.g. "requiring" -> "require"
             return stem[:-1]
-        if stem.endswith("zz"): # e.g. "buzzing" -> "buzz"
+        if stem.endswith("zz"):  # e.g. "buzzing" -> "buzz"
             return stem
-        if stem.endswith("z"): # e.g. "buzzing" -> "buzz"
+        if stem.endswith("z"):  # e.g. "buzzing" -> "buzz"
             return stem + "e"
         return stem
     return verb
@@ -568,10 +604,16 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
     """
 
     corrected_text = text
-    sorted_dict = dict(sorted(corrections_dict.items(), key=lambda x: len(str(x[0])), reverse=True))
+    sorted_dict = dict(
+        sorted(
+            corrections_dict.items(),
+            key=lambda x: len(str(x[0])),
+            reverse=True,
+        )
+    )
     for incorrect, corrected in sorted_dict.items():
         incorrect, corrected = str(incorrect).lower(), str(corrected)
-        replace = r"\b"+incorrect+r"\b"
+        replace = r"\b" + incorrect + r"\b"
         corrected_text = re.sub(replace, corrected, corrected_text)
     return corrected_text
 
@@ -618,25 +660,33 @@ def _anonymise_sentence(sentence):
     # The modified sentence is then returned.
     return anonymised_sentence
 
+
 def _add_space_around_punctuation(text: str):
     """This function will add spaces around punctuation marks,
-    while preserving slashes and hyphens in certain cases.   
+    while preserving slashes and hyphens in certain cases.
     Args:
         text (str): The string to modify.
-        
+
     Returns:
         str: The modified string.
     """
     # Add spaces around punctuation marks, excluding slashes and hyphens
-    modified_text = re.sub(r'([!"#$%&\'()*+,.:;<=>?@[\\\]^_`{|}~])', r' \1 ', text)
+    modified_text = re.sub(
+        r'([!"#$%&\'()*+,.:;<=>?@[\\\]^_`{|}~])', r" \1 ", text
+    )
 
     # Add spaces around slashes (/) where appropriate
-    modified_text = re.sub(r'((\w{3,})\s*\/\s*)(?=\w{3,})', r'\2 / ', modified_text)
+    modified_text = re.sub(
+        r"((\w{3,})\s*\/\s*)(?=\w{3,})", r"\2 / ", modified_text
+    )
 
     # Add spaces around hyphens (-) where appropriate
-    modified_text = re.sub(r'((\w{3,})\s*-\s*)(?=\w{3,})', r'\2 - ', modified_text)
+    modified_text = re.sub(
+        r"((\w{3,})\s*-\s*)(?=\w{3,})", r"\2 - ", modified_text
+    )
 
     return modified_text
+
 
 def _remove_undesirable_chars(text: str):
     """Remove undesirable characters from the text.
@@ -650,6 +700,7 @@ def _remove_undesirable_chars(text: str):
     chars_to_keep = r"\,&\.\#\@\/-"
     return re.sub(rf"[^a-zA-Z0-9 {chars_to_keep}]", " ", text)
 
+
 def _remove_duplicate_contiguous_chars(text: str):
     """Remove duplicate contiguous characters from the text.
 
@@ -661,7 +712,8 @@ def _remove_duplicate_contiguous_chars(text: str):
     """
     chars_to_keep = r"\,&\.\#\@\/-"
     # chars_to_remove = r"!\"#$%&'()\*\+,-./:;<=>\?@[\\\]^_`{|}~"
-    return re.sub(rf'([{chars_to_keep}])\1+', r'\1', text)
+    return re.sub(rf"([{chars_to_keep}])\1+", r"\1", text)
+
 
 def _remove_commas(text):
     """Remove commas from the text.

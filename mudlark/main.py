@@ -125,6 +125,9 @@ def normalise_csv(
     # Load the CSV into a DataFrame
     df = load_csv_file(input_path)
 
+    # Ensure the text column is always a string
+    df[text_column] = df[text_column].astype(str)
+
     quickgraph_id_columns_list = None
     # If the user has specified any 'quickgraph id columns',
     # load them into a list of strings.
