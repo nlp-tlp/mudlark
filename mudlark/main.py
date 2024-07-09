@@ -1,4 +1,5 @@
 """The main functions of Mudlark, i.e. normalise_csv and normalise_text."""
+import json
 import typer
 from typing_extensions import Annotated, Optional
 from typer_config import use_yaml_config
@@ -12,7 +13,10 @@ from .utils import (
     drop_long_rows,
     load_csv_file,
     save_to_quickgraph_json,
+    load_corrections_dict,
+    load_column_config,
 )
+from .column_processing import process_column
 from .normalisation import simple_normalise
 
 app = typer.Typer()
@@ -31,6 +35,12 @@ def normalise_csv(
             "'short text', 'risk name', etc."
         ),
     ],
+    anonymise_text_column: Annotated[
+        bool,
+        typer.Argument(
+            help="Whether to anonymise asset identifiers in the text."
+        ),
+    ] = False,
     output_path: Annotated[
         str,
         typer.Option(
@@ -73,15 +83,9 @@ def normalise_csv(
             "as another row will be dropped."
         ),
     ] = False,
-    csv_keep_columns: Annotated[
+    column_config_path: Annotated[
         Optional[str],
-        typer.Option(
-            help="If specified, only the given columns will be "
-            "kept in the final output. Columns should be given as a "
-            "comma separated list surrounded by double quotes, e.g. "
-            '"col1, col2, col3"...\n'
-            "This argument is only relevant when output_format = csv."
-        ),
+        typer.Option(help="If specified, ... TODO."),
     ] = None,
     quickgraph_id_columns: Annotated[
         Optional[str],
@@ -91,6 +95,13 @@ def normalise_csv(
             "specify one column (for example 'my_id'), or multiple columns "
             "separated via comma (for example 'my_id, surname').\n"
             "This argument is only relevant when output_format = quickgraph."
+        ),
+    ] = None,
+    dump_anonymised_terms_path: Annotated[
+        Optional[str],
+        typer.Option(
+            help="If specified, all terms that have been anonymised by "
+            "mudlark will be dumped to the given path."
         ),
     ] = None,
 ):
@@ -111,16 +122,18 @@ def normalise_csv(
 
     # If the user has specified any 'keep columns',
     # load them into a list of strings.
-    if csv_keep_columns is not None:
-        csv_keep_columns = parse_list(csv_keep_columns)
+    column_config = None
+    if column_config_path is not None:
         # If using quickgraph, this argument is not relevant - print a
         # warning message.
         if output_format == "quickgraph":
             logger.warning(
-                "You appear to have set 'csv_keep_columns', but this is "
+                "You appear to have set 'column_config_path', but this is "
                 "being ignored as this argument is only relevant when "
                 "output_format = csv."
             )
+
+        column_config = load_column_config(column_config_path)
 
     # Load the CSV into a DataFrame
     df = load_csv_file(input_path)
@@ -149,26 +162,77 @@ def normalise_csv(
 
     # If keep_columns is present, drop all columns not in this list
     # (and always keep the text_column).
-    if csv_keep_columns and output_format == "csv":
+    if column_config and output_format == "csv":
+        csv_keep_columns = [c.name for c in column_config.columns]
         df = drop_unwanted_columns(df, csv_keep_columns, text_column)
 
     # If drop_duplicates is True, drop rows accordingly
-    if drop_duplicates:
+    if drop_duplicates == "True":
         df = run_drop_duplicates(df, text_column)
 
     # If max_words is present, drop all rows with > max_words
     if max_words:
         df = drop_long_rows(df, text_column, max_words)
 
-    # Run the normalisation over each row, on the text column
-    df[text_column] = df[text_column].apply(
-        lambda x: simple_normalise(x, corrections_path)
-    )
-
     # If max rows, randomly sample
     if max_rows:
         df = df.sample(n=max_rows)
         logger.info(f"Randomly sampled to {len(df)} rows.")
+
+    corrections_dict = load_corrections_dict(corrections_path)
+
+    # Run the normalisation over each row, on the text column
+    # Maintain a list of anonymised terms to dump later, if needed
+    anonymised_terms = []
+    num_rows = len(df.index)
+    x = 0
+    for i, row in df.iterrows():
+        df.at[i, text_column], anons = simple_normalise(
+            df.at[i, text_column],
+            anonymise_text_column,
+            corrections_dict,
+            dump_anonymised_terms_path,
+        )
+        anonymised_terms += anons
+        x += 1
+        if x % 100 == 0 and x > 1:
+            logger.info(f"Completed {x} of {num_rows} rows")
+    anonymised_terms = sorted(list(set(anonymised_terms)))
+
+    # TODO: Migrate to its own function
+    # Map anonymised terms to IDs automatically
+    # Make sure to map everything properly, e.g. ABC-123 and ABC 123
+    # should both map to the same AssetID e.g. Asset5
+    anonymised_terms_map = {}
+    for term in anonymised_terms:
+        term_normed = term.replace(" ", "").replace("-", "")
+        if term_normed not in anonymised_terms_map:
+            anonymised_terms_map[term_normed] = "Asset%d" % (
+                len(anonymised_terms_map) + 1
+            )
+
+    if dump_anonymised_terms_path and len(anonymised_terms) > 0:
+        with open(dump_anonymised_terms_path, "w", encoding="utf-8") as f:
+            for i, term in enumerate(anonymised_terms):
+                term_normed = term.replace(" ", "").replace("-", "")
+                f.write(term + ", " + (anonymised_terms_map[term_normed]))
+                f.write("\n")
+        logger.info(
+            f"Dumped {len(anonymised_terms)} anonymised terms to "
+            f"{dump_anonymised_terms_path}"
+        )
+
+    # Process columns if specified
+    if column_config and output_format == "csv":
+        logger.info("Processing other columns...")
+        mappings = {}
+        for c in column_config.columns:
+            logger.info(f"Processing '{c}'...")
+            df, mappings[c.name] = process_column(
+                df, c.name, c.handler, c.prefix
+            )
+        with open(column_config.output_path, "w", encoding="utf-8") as f:
+            json.dump(mappings, f, indent=2)
 
     if not output_path:
         return df

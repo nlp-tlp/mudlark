@@ -1,26 +1,40 @@
 """Functions for normalising text."""
 import re
 from nltk import word_tokenize
-from mudlark.utils import load_corrections_dict
+from ..logger import logger
+from typing import Dict
 
 
-def simple_normalise(text: str, corrections_path: str = None):
+def simple_normalise(
+    text: str,
+    anonymise: bool = False,
+    corrections_dict: Dict = None,
+    dump_anonymised_terms_path: str = None,
+):
     """Run the 'simple' normalisation over the given text.
 
     Args:
         text (str): The text to normalise.
-        corrections_path (str, optional): The path containing the
-           corrections dictionary. If not present, will use the default.
+        corrections_dict (dict, optional): The corrections dictionary,
+        which has been sorted in ascending order of length.
 
     Returns:
         str: The normalised text.
 
     """
 
-    corrections_dict = load_corrections_dict(corrections_path)
+    # 0. Anonymise sentence BEFORE lowercasing text
+    # (as the regex relies on uppercase to denote asset identifiers)
+    # text, anonymised_terms = _anonymise_sentence(text)
+    anonymised_terms = []
 
     # 1. Lowercase text
     text = text.lower()
+
+    # 6. Fix typos
+    text = _correct_typos(
+        text=text, corrections_dict=corrections_dict
+    )  # i.e. "filters - filters accumulated due to contamination."
 
     # 2. Remove commas
     text = _remove_commas(text)
@@ -34,16 +48,8 @@ def simple_normalise(text: str, corrections_path: str = None):
     # 5. Add space around punctuation
     text = _add_space_around_punctuation(text)
 
-    # 6. Anonymise sentence
-    text = _anonymise_sentence(text)
-
-    # 7. Remove extra spaces
+    # 8. Remove extra spaces
     text = _remove_extra_spaces(text)
-
-    # 8. Fix typos
-    text = _correct_typos(
-        text=text, corrections_dict=corrections_dict
-    )  # i.e. "filters - filters accumulated due to contamination."
 
     # 9. Tokenize
     tokens = word_tokenize(text)  # i.e. ["filters", "-", ...]
@@ -60,10 +66,13 @@ def simple_normalise(text: str, corrections_path: str = None):
         for token in tokens
     ]  # i.e. ["filter", "-", ...]
 
+    # Fix up the AssetID anonymisation tokens
+    text = text.replace("assetid", "AssetID")
+
     # 12. Recreate _text as string based on processed tokens.
     text = " ".join(tokens)
 
-    return text
+    return text, anonymised_terms
 
 
 def _remove_extra_spaces(text):
@@ -604,14 +613,8 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
     """
 
     corrected_text = text
-    sorted_dict = dict(
-        sorted(
-            corrections_dict.items(),
-            key=lambda x: len(str(x[0])),
-            reverse=True,
-        )
-    )
-    for incorrect, corrected in sorted_dict.items():
+
+    for incorrect, corrected in corrections_dict.items():
         incorrect, corrected = str(incorrect).lower(), str(corrected)
         replace = r"\b" + incorrect + r"\b"
         corrected_text = re.sub(replace, corrected, corrected_text)
@@ -647,18 +650,38 @@ def _anonymise_sentence(sentence):
     Returns:
         str: The anonymised sentence.
     """
-    pattern = (
-        r"\b(\d*[A-Za-z]+\d+[A-Za-z]*|[A-Za-z]*\d+[A-Za-z]+|"
-        r"[A-Za-z]*\d+[A-Za-z]*|[A-Za-z]\d[A-Za-z]\d\d[A-Za-z])\b"
-    )
+    # pattern = re.compile(
+    #     r"\b(\d*[A-Za-z]+\d+[A-Za-z]*|[A-Za-z]*\d+[A-Za-z]+|"
+    #     r"[A-Za-z]*\d+[A-Za-z]*|[A-Za-z]\d[A-Za-z]\d\d[A-Za-z])\b"
+    # )
+    #
+
+    # Pattern one (ABC-123, ABC 123, ABC123 etc)
+    pattern_1 = re.compile(r"\b[A-Z]+\s*-*\d+\b")
+    # pattern_2 = re.compile(r"\b\d+\s*-*[A-Z]+\b")
+    anonymised_terms = set()
+
+    # Ignore measurement related items
+    # unwanted_pattern = re.compile(
+    #    r"\d+(deg|a|kv|v|w|wk|amp|l|kl|ml|w|mm|m|km|hr|hrs|x|g|kg|t|d|y|yr)s?"
+    # )
 
     # Using the re.sub() method, we replace any substring in the 'sentence'
-    # that matches our 'pattern' with the word "AssetID". This function
+    # that matches our 'pattern' with the word "asset_id". This function
     # returns a new string where all the replacements have been made.
-    anonymised_sentence = re.sub(pattern, "AssetID", sentence)
+    matches_1 = re.findall(pattern_1, sentence)
+    # matches_2 = re.findall(pattern_2, sentence)
+    matches = matches_1
+    for m in matches:
+        # if m.startswith("Asset") or len(m) <= 1 or m.isnumeric():
+        #    continue
+        # if re.match(unwanted_pattern, m):
+        #    continue
+        sentence = sentence.replace(m, "AssetID")
+        anonymised_terms.add(m)
 
     # The modified sentence is then returned.
-    return anonymised_sentence
+    return sentence, anonymised_terms
 
 
 def _add_space_around_punctuation(text: str):

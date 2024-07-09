@@ -2,9 +2,11 @@
 import os
 import pathlib
 import json
+import yaml
 from typing import Dict
 import pandas as pd
 from mudlark.logger import logger
+from mudlark.column_config import ColumnConfig
 
 
 def load_csv_file(path: str):
@@ -43,7 +45,25 @@ def load_corrections_dict(path: str = None) -> Dict:
     df = load_csv_file(path)
     corrections_dict = df.set_index(df.columns[0])[df.columns[1]].to_dict()
 
-    return corrections_dict
+    sorted_dict = dict(
+        sorted(
+            corrections_dict.items(),
+            key=lambda x: len(str(x[0])),
+            reverse=True,
+        )
+    )
+
+    return sorted_dict
+
+
+def load_column_config(config_path: str):
+    with open(config_path, "r", encoding="utf-8") as f:
+        try:
+            content = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            raise ValueError(e) from e
+    config = ColumnConfig(**content)
+    return config
 
 
 def save_to_quickgraph_json(
