@@ -59,7 +59,7 @@ This file dictates which columns should be kept by Mudlark, and how it should ha
 * ``ToUniqueString`` converts each unique value into an anonymised string, starting with the given ``prefix``. For example, ``Pump FLOC`` might become ``FLOC_Desc_1``, ``Belt FLOC`` might become ``FLOC_Desc_2``, and so on.
 
 Example
-^^^^^^^
+-------
 
 Here is an example dataset::
 
