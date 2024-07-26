@@ -1,0 +1,3 @@
+columns:
+  - name: cost
+    handler: None

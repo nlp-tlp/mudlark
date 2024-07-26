@@ -18,6 +18,7 @@ from .utils import (
 )
 from .column_processing import process_column
 from .normalisation import simple_normalise
+from .anonymisation import get_anonymised_terms
 
 app = typer.Typer()
 
@@ -35,7 +36,7 @@ def normalise_csv(
             "'short text', 'risk name', etc."
         ),
     ],
-    anonymise_text_column: Annotated[
+    anonymise_text: Annotated[
         bool,
         typer.Argument(
             help="Whether to anonymise asset identifiers in the text."
@@ -79,7 +80,7 @@ def normalise_csv(
     drop_duplicates: Annotated[
         Optional[str],
         typer.Option(
-            help="If true, any rows with the same text in the text field "
+            help="If True, any rows with the same text in the text field "
             "as another row will be dropped."
         ),
     ] = False,
@@ -167,7 +168,7 @@ def normalise_csv(
         df = drop_unwanted_columns(df, csv_keep_columns, text_column)
 
     # If drop_duplicates is True, drop rows accordingly
-    if drop_duplicates == "True":
+    if drop_duplicates in ["true", "True", "yes", "Yes"]:
         df = run_drop_duplicates(df, text_column)
 
     # If max_words is present, drop all rows with > max_words
@@ -183,44 +184,62 @@ def normalise_csv(
 
     # Run the normalisation over each row, on the text column
     # Maintain a list of anonymised terms to dump later, if needed
-    anonymised_terms = []
+    #
+    # TODO: Move into its own function/refactor this code
+    anonymised_terms_map = {}
+    if anonymise_text:
+        anonymised_terms = set()
+        logger.info("Anonymising text...")
+
+        # Get a set of all anonymisable terms matching a regex
+        for i, _ in df.iterrows():
+            terms = get_anonymised_terms(df.at[i, text_column])
+            for t in terms:
+                anonymised_terms.add(t)
+
+        # Map each anonymised term to an Asset ID e.g.
+        # ABC123 -> Asset1
+        for term in anonymised_terms:
+            term_normed = term.replace(" ", "").replace("-", "")
+            if term_normed not in anonymised_terms_map:
+                n = len(anonymised_terms_map) + 1
+                anonymised_terms_map[term_normed] = f"Asset{n}"
+            if term_normed in anonymised_terms_map:
+                anonymised_terms_map[term] = anonymised_terms_map[term_normed]
+
+        # If desired, dump the anonymised terms to a file
+        if dump_anonymised_terms_path and len(anonymised_terms) > 0:
+            with open(dump_anonymised_terms_path, "w", encoding="utf-8") as f:
+                for i, term in enumerate(anonymised_terms):
+                    term_normed = term.replace(" ", "").replace("-", "")
+                    f.write(term + ", " + (anonymised_terms_map[term_normed]))
+                    f.write("\n")
+            logger.info(
+                f"Dumped {len(anonymised_terms)} anonymised terms to "
+                f"{dump_anonymised_terms_path}"
+            )
+
+        logger.info(f"Found {len(anonymised_terms)} anonymisable terms.")
+
+    # Iterate over every row and normalise the text column
     num_rows = len(df.index)
     x = 0
-    for i, row in df.iterrows():
-        df.at[i, text_column], anons = simple_normalise(
+    for i, _ in df.iterrows():
+        df.at[i, text_column] = simple_normalise(
             df.at[i, text_column],
-            anonymise_text_column,
             corrections_dict,
-            dump_anonymised_terms_path,
+            anonymised_terms_map,
         )
-        anonymised_terms += anons
+        # anonymised_terms += anons
         x += 1
         if x % 100 == 0 and x > 1:
             logger.info(f"Completed {x} of {num_rows} rows")
-    anonymised_terms = sorted(list(set(anonymised_terms)))
+    # anonymised_terms = sorted(list(set(anonymised_terms)))
 
     # TODO: Migrate to its own function
     # Map anonymised terms to IDs automatically
     # Make sure to map everything properly, e.g. ABC-123 and ABC 123
     # should both map to the same AssetID e.g. Asset5
-    anonymised_terms_map = {}
-    for term in anonymised_terms:
-        term_normed = term.replace(" ", "").replace("-", "")
-        if term_normed not in anonymised_terms_map:
-            anonymised_terms_map[term_normed] = "Asset%d" % (
-                len(anonymised_terms_map) + 1
-            )
-
-    if dump_anonymised_terms_path and len(anonymised_terms) > 0:
-        with open(dump_anonymised_terms_path, "w", encoding="utf-8") as f:
-            for i, term in enumerate(anonymised_terms):
-                term_normed = term.replace(" ", "").replace("-", "")
-                f.write(term + ", " + (anonymised_terms_map[term_normed]))
-                f.write("\n")
-        logger.info(
-            f"Dumped {len(anonymised_terms)} anonymised terms to "
-            f"{dump_anonymised_terms_path}"
-        )
 
     # Process columns if specified
     if column_config and output_format == "csv":
@@ -231,8 +250,12 @@ def normalise_csv(
             df, mappings[c.name] = process_column(
                 df, c.name, c.handler, c.prefix
             )
-        with open(column_config.output_path, "w", encoding="utf-8") as f:
-            json.dump(mappings, f, indent=2)
+        if column_config.output_path:
+            with open(column_config.output_path, "w", encoding="utf-8") as f:
+                json.dump(mappings, f, indent=2)
+                logger.info(
+                    f"Dumped column details to {column_config.output_path}."
+                )
 
     if not output_path:
         return df
@@ -268,7 +291,8 @@ def normalise_text(
            corrections. If not specified, the default corrections csv
            will be used.
     """
-    text = simple_normalise(text, corrections_path)
+    corrections_dict = load_corrections_dict(corrections_path)
+    text = simple_normalise(text, corrections_dict)
 
     return text
 

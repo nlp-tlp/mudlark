@@ -6,10 +6,7 @@ from typing import Dict
 
 
 def simple_normalise(
-    text: str,
-    anonymise: bool = False,
-    corrections_dict: Dict = None,
-    dump_anonymised_terms_path: str = None,
+    text: str, corrections_dict: Dict, anonymisation_dict: Dict = None
 ):
     """Run the 'simple' normalisation over the given text.
 
@@ -23,18 +20,14 @@ def simple_normalise(
 
     """
 
-    # 0. Anonymise sentence BEFORE lowercasing text
-    # (as the regex relies on uppercase to denote asset identifiers)
-    # text, anonymised_terms = _anonymise_sentence(text)
-    anonymised_terms = []
-
-    # 1. Lowercase text
+    # 0. Lowercase text
     text = text.lower()
 
-    # 6. Fix typos
-    text = _correct_typos(
-        text=text, corrections_dict=corrections_dict
-    )  # i.e. "filters - filters accumulated due to contamination."
+    # 1. Anonymise using the anonymisation dict
+    if anonymisation_dict:
+        text = _correct_typos(
+            text=text, corrections_dict=anonymisation_dict
+        )  # i.e. "filters - filters accumulated due to contamination."
 
     # 2. Remove commas
     text = _remove_commas(text)
@@ -48,31 +41,33 @@ def simple_normalise(
     # 5. Add space around punctuation
     text = _add_space_around_punctuation(text)
 
-    # 8. Remove extra spaces
+    # 6. Remove extra spaces
     text = _remove_extra_spaces(text)
 
-    # 9. Tokenize
+    # 7. Fix typos
+    text = _correct_typos(
+        text=text, corrections_dict=corrections_dict
+    )  # i.e. "filters - filters accumulated due to contamination."
+
+    # 8. Tokenize
     tokens = word_tokenize(text)  # i.e. ["filters", "-", ...]
 
-    # 10. Align tense - Function expects TOKENS not a STRING
+    # 9. Align tense - Function expects TOKENS not a STRING
     tokens = [
         _to_present_tense(verb=token, corrections_dict=corrections_dict)
         for token in tokens
     ]  # i.e. [... "accumulat", ...]
 
-    # 11. Pluralise - Function expects TOKENS not a STRING
+    # 10. Pluralise - Function expects TOKENS not a STRING
     tokens = [
         _singularise(word=token, corrections_dict=corrections_dict)
         for token in tokens
     ]  # i.e. ["filter", "-", ...]
 
-    # Fix up the AssetID anonymisation tokens
-    text = text.replace("assetid", "AssetID")
-
-    # 12. Recreate _text as string based on processed tokens.
+    # 11. Recreate _text as string based on processed tokens.
     text = " ".join(tokens)
 
-    return text, anonymised_terms
+    return text
 
 
 def _remove_extra_spaces(text):
@@ -619,69 +614,6 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
         replace = r"\b" + incorrect + r"\b"
         corrected_text = re.sub(replace, corrected, corrected_text)
     return corrected_text
-
-
-def _anonymise_sentence(sentence):
-    """Anonymise the given sentence.
-
-    The pattern to match asset identifiers is defined as follows:
-
-    b: This represents a word boundary. It ensures that the pattern
-    we're trying to match is treated as a distinct word, not as part
-    of another word.
-
-    [A-Za-z]*: This matches zero or more alphabetical characters. It covers
-    patterns where an asset identifier might start with letters like "AB" in
-    "AB12".
-
-    d+: This matches one or more numeric characters. It ensures we match
-    patterns that have numbers in them like "12" in "AB12".
-
-    [A-Za-z]*: This again matches zero or more alphabetical characters.
-    It covers patterns where an asset identifier might end with
-    letters like "a" in "AB12a".
-
-    b: Another word boundary to ensure the end of our matched pattern is
-    also treated as a distinct word.
-
-    Args:
-        sentence (str): The sentence to anonymise.
-
-    Returns:
-        str: The anonymised sentence.
-    """
-    # pattern = re.compile(
-    #     r"\b(\d*[A-Za-z]+\d+[A-Za-z]*|[A-Za-z]*\d+[A-Za-z]+|"
-    #     r"[A-Za-z]*\d+[A-Za-z]*|[A-Za-z]\d[A-Za-z]\d\d[A-Za-z])\b"
-    # )
-    #
-
-    # Pattern one (ABC-123, ABC 123, ABC123 etc)
-    pattern_1 = re.compile(r"\b[A-Z]+\s*-*\d+\b")
-    # pattern_2 = re.compile(r"\b\d+\s*-*[A-Z]+\b")
-    anonymised_terms = set()
-
-    # Ignore measurement related items
-    # unwanted_pattern = re.compile(
-    #    r"\d+(deg|a|kv|v|w|wk|amp|l|kl|ml|w|mm|m|km|hr|hrs|x|g|kg|t|d|y|yr)s?"
-    # )
-
-    # Using the re.sub() method, we replace any substring in the 'sentence'
-    # that matches our 'pattern' with the word "asset_id". This function
-    # returns a new string where all the replacements have been made.
-    matches_1 = re.findall(pattern_1, sentence)
-    # matches_2 = re.findall(pattern_2, sentence)
-    matches = matches_1
-    for m in matches:
-        # if m.startswith("Asset") or len(m) <= 1 or m.isnumeric():
-        #    continue
-        # if re.match(unwanted_pattern, m):
-        #    continue
-        sentence = sentence.replace(m, "AssetID")
-        anonymised_terms.add(m)
-
-    # The modified sentence is then returned.
-    return sentence, anonymised_terms
 
 
 def _add_space_around_punctuation(text: str):

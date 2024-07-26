@@ -1,0 +1,5 @@
+columns:
+  - name: non_existant_column
+    handler: None
+  - name: cost
+    handler: None

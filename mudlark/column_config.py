@@ -25,4 +25,4 @@ class Column(BaseModel):
 
 class ColumnConfig(ConfiguredBaseModel):
     columns: List[Column]
-    output_path: StrictStr
+    output_path: Optional[StrictStr] = None
