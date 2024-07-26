@@ -1,6 +1,8 @@
 """The main functions of Mudlark, i.e. normalise_csv and normalise_text."""
 import json
 import typer
+import random
+from collections import OrderedDict
 from typing_extensions import Annotated, Optional
 from typer_config import use_yaml_config
 
@@ -36,12 +38,6 @@ def normalise_csv(
             "'short text', 'risk name', etc."
         ),
     ],
-    anonymise_text: Annotated[
-        bool,
-        typer.Argument(
-            help="Whether to anonymise asset identifiers in the text."
-        ),
-    ] = False,
     output_path: Annotated[
         str,
         typer.Option(
@@ -56,6 +52,12 @@ def normalise_csv(
             "a QuickGraph-compatible JSON file)."
         ),
     ] = "quickgraph",
+    anonymise_text: Annotated[
+        bool,
+        typer.Argument(
+            help="Whether to anonymise asset identifiers in the text."
+        ),
+    ] = False,
     max_rows: Annotated[
         Optional[int],
         typer.Option(
@@ -103,6 +105,15 @@ def normalise_csv(
         typer.Option(
             help="If specified, all terms that have been anonymised by "
             "mudlark will be dumped to the given path."
+        ),
+    ] = None,
+    dump_processed_columns_path: Annotated[
+        Optional[str],
+        typer.Option(
+            help="If specified, all original columns from the CSV that "
+            "were modified by Mudlark will be dumped to the given path. "
+            "This can be used to map the values from the new CSV back to "
+            "the old CSV."
         ),
     ] = None,
 ):
@@ -186,7 +197,7 @@ def normalise_csv(
     # Maintain a list of anonymised terms to dump later, if needed
     #
     # TODO: Move into its own function/refactor this code
-    anonymised_terms_map = {}
+    anonymised_terms_map = OrderedDict()
     if anonymise_text:
         anonymised_terms = set()
         logger.info("Anonymising text...")
@@ -199,20 +210,20 @@ def normalise_csv(
 
         # Map each anonymised term to an Asset ID e.g.
         # ABC123 -> Asset1
-        for term in anonymised_terms:
+        anonymised_terms = sorted(list(anonymised_terms))
+        norm_term_map = {}
+        random.shuffle(anonymised_terms)
+        for i, term in enumerate(anonymised_terms):
             term_normed = term.replace(" ", "").replace("-", "")
-            if term_normed not in anonymised_terms_map:
-                n = len(anonymised_terms_map) + 1
-                anonymised_terms_map[term_normed] = f"Asset{n}"
-            if term_normed in anonymised_terms_map:
-                anonymised_terms_map[term] = anonymised_terms_map[term_normed]
+            if term_normed not in norm_term_map:
+                norm_term_map[term_normed] = f"Asset{len(norm_term_map) + 1}"
+            anonymised_terms_map[term] = norm_term_map[term_normed]
 
         # If desired, dump the anonymised terms to a file
         if dump_anonymised_terms_path and len(anonymised_terms) > 0:
             with open(dump_anonymised_terms_path, "w", encoding="utf-8") as f:
                 for i, term in enumerate(anonymised_terms):
-                    term_normed = term.replace(" ", "").replace("-", "")
-                    f.write(term + ", " + (anonymised_terms_map[term_normed]))
+                    f.write(term + ", " + (anonymised_terms_map[term]))
                     f.write("\n")
             logger.info(
                 f"Dumped {len(anonymised_terms)} anonymised terms to "
@@ -250,11 +261,11 @@ def normalise_csv(
             df, mappings[c.name] = process_column(
                 df, c.name, c.handler, c.prefix
             )
-        if column_config.output_path:
-            with open(column_config.output_path, "w", encoding="utf-8") as f:
+        if dump_processed_columns_path:
+            with open(dump_processed_columns_path, "w", encoding="utf-8") as f:
                 json.dump(mappings, f, indent=2)
                 logger.info(
-                    f"Dumped column details to {column_config.output_path}."
+                    f"Dumped column details to {dump_processed_columns_path}."
                 )
 
     if not output_path:

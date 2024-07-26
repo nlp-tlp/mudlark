@@ -1,0 +1,10 @@
+text,cost,other,floc,mwo_id,unique_floc_desc
+ABC 124 is broken,123,test,123.45.67,123,FLOC 123
+replace,43,xx,123.45.68,123,FLOC 124
+X/X,540,test,123.45.69,123,FLOC 125
+ABC 123 has a problem,3,test,123.45.67,123,FLOC 123
+slurries,4.3,xx,123.45.67,123,FLOC 123
+ABC-124 is broken,4.33,yrds,123.45.67,123,FLOC 123
+pumps busted,43.43,tyrdtrd,111.45.67,123,FLOC 125
+enGiNe was broken,4332.3,6t554,112.45.67,123,FLOC 126
+a leak was Formed,333,545,113.45.67,123,FLOC 127

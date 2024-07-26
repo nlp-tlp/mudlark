@@ -90,6 +90,10 @@ from mudlark import normalise_text
             "pens focus tennis campuses",
             "pen focus tennis campus",
         ),  # general case
+        # Other edge cases
+        ("too many people", "too many person"),
+        ("inventives", "inventive"),
+        ("alias", "alias"),
     ],
 )
 def test_normalise_text_default(test_input, expected):

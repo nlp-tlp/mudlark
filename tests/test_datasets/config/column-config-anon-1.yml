@@ -1,0 +1,10 @@
+columns:
+  - name: floc
+    handler: FLOC
+  - name: mwo_id
+    handler: RandomiseInteger
+  - name: unique_floc_desc
+    handler: ToUniqueString
+    prefix: FLOC_Desc_
+  - name: other
+    handler: None

@@ -7,7 +7,8 @@ from mudlark import normalise_csv
 
 def _files_same(output_path, expected_output_path):
     return (
-        open(output_path, "r").read() == open(expected_output_path, "r").read()
+        open(output_path, "r", encoding="utf-8").read()
+        == open(expected_output_path, "r", encoding="utf-8").read()
     )
 
 
