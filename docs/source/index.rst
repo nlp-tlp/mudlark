@@ -44,5 +44,6 @@ Part of the normalisation stage involves replacing any words appearing in a pred
    self
    installation
    usage
+   anonymisation
    implementation
 

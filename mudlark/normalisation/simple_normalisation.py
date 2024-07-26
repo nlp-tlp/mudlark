@@ -1,26 +1,33 @@
 """Functions for normalising text."""
 import re
 from nltk import word_tokenize
-from mudlark.utils import load_corrections_dict
+from ..logger import logger
+from typing import Dict
 
 
-def simple_normalise(text: str, corrections_path: str = None):
+def simple_normalise(
+    text: str, corrections_dict: Dict, anonymisation_dict: Dict = None
+):
     """Run the 'simple' normalisation over the given text.
 
     Args:
         text (str): The text to normalise.
-        corrections_path (str, optional): The path containing the
-           corrections dictionary. If not present, will use the default.
+        corrections_dict (dict, optional): The corrections dictionary,
+        which has been sorted in ascending order of length.
 
     Returns:
         str: The normalised text.
 
     """
 
-    corrections_dict = load_corrections_dict(corrections_path)
-
-    # 1. Lowercase text
+    # 0. Lowercase text
     text = text.lower()
+
+    # 1. Anonymise using the anonymisation dict
+    if anonymisation_dict:
+        text = _correct_typos(
+            text=text, corrections_dict=anonymisation_dict
+        )  # i.e. "filters - filters accumulated due to contamination."
 
     # 2. Remove commas
     text = _remove_commas(text)
@@ -34,33 +41,30 @@ def simple_normalise(text: str, corrections_path: str = None):
     # 5. Add space around punctuation
     text = _add_space_around_punctuation(text)
 
-    # 6. Anonymise sentence
-    text = _anonymise_sentence(text)
-
-    # 7. Remove extra spaces
+    # 6. Remove extra spaces
     text = _remove_extra_spaces(text)
 
-    # 8. Fix typos
+    # 7. Fix typos
     text = _correct_typos(
         text=text, corrections_dict=corrections_dict
     )  # i.e. "filters - filters accumulated due to contamination."
 
-    # 9. Tokenize
+    # 8. Tokenize
     tokens = word_tokenize(text)  # i.e. ["filters", "-", ...]
 
-    # 10. Align tense - Function expects TOKENS not a STRING
+    # 9. Align tense - Function expects TOKENS not a STRING
     tokens = [
         _to_present_tense(verb=token, corrections_dict=corrections_dict)
         for token in tokens
     ]  # i.e. [... "accumulat", ...]
 
-    # 11. Pluralise - Function expects TOKENS not a STRING
+    # 10. Pluralise - Function expects TOKENS not a STRING
     tokens = [
         _singularise(word=token, corrections_dict=corrections_dict)
         for token in tokens
     ]  # i.e. ["filter", "-", ...]
 
-    # 12. Recreate _text as string based on processed tokens.
+    # 11. Recreate _text as string based on processed tokens.
     text = " ".join(tokens)
 
     return text
@@ -604,61 +608,12 @@ def _correct_typos(text: str, corrections_dict: dict) -> str:
     """
 
     corrected_text = text
-    sorted_dict = dict(
-        sorted(
-            corrections_dict.items(),
-            key=lambda x: len(str(x[0])),
-            reverse=True,
-        )
-    )
-    for incorrect, corrected in sorted_dict.items():
+
+    for incorrect, corrected in corrections_dict.items():
         incorrect, corrected = str(incorrect).lower(), str(corrected)
         replace = r"\b" + incorrect + r"\b"
         corrected_text = re.sub(replace, corrected, corrected_text)
     return corrected_text
-
-
-def _anonymise_sentence(sentence):
-    """Anonymise the given sentence.
-
-    The pattern to match asset identifiers is defined as follows:
-
-    b: This represents a word boundary. It ensures that the pattern
-    we're trying to match is treated as a distinct word, not as part
-    of another word.
-
-    [A-Za-z]*: This matches zero or more alphabetical characters. It covers
-    patterns where an asset identifier might start with letters like "AB" in
-    "AB12".
-
-    d+: This matches one or more numeric characters. It ensures we match
-    patterns that have numbers in them like "12" in "AB12".
-
-    [A-Za-z]*: This again matches zero or more alphabetical characters.
-    It covers patterns where an asset identifier might end with
-    letters like "a" in "AB12a".
-
-    b: Another word boundary to ensure the end of our matched pattern is
-    also treated as a distinct word.
-
-    Args:
-        sentence (str): The sentence to anonymise.
-
-    Returns:
-        str: The anonymised sentence.
-    """
-    pattern = (
-        r"\b(\d*[A-Za-z]+\d+[A-Za-z]*|[A-Za-z]*\d+[A-Za-z]+|"
-        r"[A-Za-z]*\d+[A-Za-z]*|[A-Za-z]\d[A-Za-z]\d\d[A-Za-z])\b"
-    )
-
-    # Using the re.sub() method, we replace any substring in the 'sentence'
-    # that matches our 'pattern' with the word "AssetID". This function
-    # returns a new string where all the replacements have been made.
-    anonymised_sentence = re.sub(pattern, "AssetID", sentence)
-
-    # The modified sentence is then returned.
-    return anonymised_sentence
 
 
 def _add_space_around_punctuation(text: str):

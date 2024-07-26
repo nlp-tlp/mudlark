@@ -7,7 +7,8 @@ from mudlark import normalise_csv
 
 def _files_same(output_path, expected_output_path):
     return (
-        open(output_path, "r").read() == open(expected_output_path, "r").read()
+        open(output_path, "r", encoding="utf-8").read()
+        == open(expected_output_path, "r", encoding="utf-8").read()
     )
 
 
@@ -43,13 +44,6 @@ def _files_same(output_path, expected_output_path):
             "simple_normalised_qg.json",
             "text",
             {"max_words": 100},
-        ),
-        # If csv_keep_columns is set, it should still work (just log a warning)
-        (
-            "simple.csv",
-            "simple_normalised_qg.json",
-            "text",
-            {"csv_keep_columns": "hello"},
         ),
     ],
     indirect=["input_path", "expected_output_path"],
@@ -89,7 +83,9 @@ def test_normalise_csv_to_quickgraph(
             "simple.csv",
             "simple_normalised_csv_fewer_columns.csv",
             "text",
-            {"csv_keep_columns": "text, cost"},
+            {
+                "column_config_path": "tests/test_datasets/config/column-config-1.yml"
+            },
         ),
         # Testing dropping duplicate rows
         (
@@ -222,7 +218,9 @@ def test_normalise_csv_to_quickgraph_errors(
             "text",
             {
                 "output_format": "csv",
-                "csv_keep_columns": "non_existent_column, cost",
+                "column_config_path": (
+                    "tests/test_datasets/config/column-config-2.yml"
+                ),
             },
             ValueError,
             "was not found in the input dataset. Please check all columns",

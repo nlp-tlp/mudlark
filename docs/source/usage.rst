@@ -39,12 +39,15 @@ Optional arguments:
     * - Argument
       - Type
       - Details
-    * - ``output-format``
-      - Text
-      - The format to save the output. Can be either 'quickgraph' (saves the output as a QuickGraph-compatible JSON file) or 'csv' (saves the output as a CSV file). [default: quickgraph]
     * - ``output-path``
       - Text
       - The path to save the normalised dataset to once complete.
+    * - ``output-format``
+      - Text
+      - The format to save the output. Can be either 'quickgraph' (saves the output as a QuickGraph-compatible JSON file) or 'csv' (saves the output as a CSV file). [default: quickgraph]
+    * - ``anonymise-text``
+      - Boolean
+      - Whether to anonymise asset identifiers in the text. If true, any asset identifiers e.g. "ABC 123", "ABC123", "ABC-123" will be converted to anonymised identifiers e.g. Asset1. See the next section for more details.
     * - ``max-rows``
       - Integer
       - If specified, the output will be randomly sampled to contain the specified maximum number of rows.
@@ -57,12 +60,20 @@ Optional arguments:
     * - ``drop-duplicates``
       - Boolean
       - If true, any rows with the same text in the text field as another row will be dropped. [default: False]
-    * - ``csv-keep-columns``
+    * - ``column-config-path``
       - Text
-      - If specified, only the given columns will be kept in the final output. Columns should be given as a comma separated list surrounded by double quotes, e.g. "col1, col2, col3"... This argument is only relevant when output_format = csv.
+      - If specified, the given path (must be a ``.yml`` file) will be used to determine which columns to keep in the output, and what to do with those columns. See the next section for more details.
     * - ``quickgraph-id-columns``
       - Text
       - If specified, the given column(s) will be used as id columns when generating output for QuickGraph. You may specify one column (for example 'my_id'), or multiple columns separated via comma (for example 'my_id, surname'). This argument is only relevant when output_format = quickgraph.
+    * - ``dump-anonymised-terms-path``
+      - Text
+      - If specified, any terms that were anonymised by Mudlark (assuming ``anonymise-text`` was set to ``True``) will be saved to this path. This allows you to reverse the anonymisation at a later date if necessary.
+    * - ``dump-processed-columns-path``
+      - Text
+      - If specified, any columns that were processed by Mudlark (assuming ``column-config-path`` was set) will be saved to this path. This allows you to reverse the column processing at a later date if necessary.
+
+
 
 Simple example
 ^^^^^^^^^^^^^^
@@ -101,6 +112,7 @@ Then, you can read it in via the ``config`` argument::
     python -m mudlark --config mudlark.yml
 
 Note that the arguments have underscores (``_``) instead of dashes (``-``) when written in the yaml file.
+
 
 Running Mudlark in Python
 -------------------------

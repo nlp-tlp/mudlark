@@ -21,7 +21,7 @@ def drop_unwanted_columns(
         if c not in df:
             raise ValueError(
                 f"The column '{c}' was not found in the input dataset. "
-                "Please check all columns listed in the 'keep_columns' list "
+                "Please check all columns listed in the 'column_config_path' "
                 "exist in the input dataset."
             )
 
