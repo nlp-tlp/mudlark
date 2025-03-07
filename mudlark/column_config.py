@@ -1,20 +1,14 @@
-import os
-from typing import List, Optional, Literal, Union
+from typing import List, Optional, Literal
 from pydantic import (
     BaseModel,
     StrictStr,
-    Extra,
-    field_validator,
-    FieldValidationInfo,
+    ConfigDict,
 )
 
 _handlers = ["FLOC", "RandomiseInteger", "ToUniqueString", "None"]
 
-
 class ConfiguredBaseModel(BaseModel):
-    class Config:
-        extra = "forbid"
-
+    model_config = ConfigDict(extra="forbid")
 
 class Column(BaseModel):
     name: StrictStr
