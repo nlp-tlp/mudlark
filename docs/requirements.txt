@@ -9,7 +9,7 @@ docutils==0.17.1
 idna==3.7
 imagesize==1.4.1
 interchange==2021.0.4
-Jinja2==3.1.5
+Jinja2==3.1.6
 loguru==0.7.2
 MarkupSafe==2.1.1
 monotonic==1.6
